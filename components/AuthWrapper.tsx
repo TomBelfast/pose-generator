@@ -88,6 +88,8 @@ const UserLimitDisplay: React.FC<{ refreshLimit?: () => void }> = ({ refreshLimi
   
   // Use the passed refreshLimit function if available, otherwise use the one from hook
   const refreshFunction = refreshLimit || refresh;
+  
+  console.log('🔍 UserLimitDisplay: Current state:', { remaining, limit, isLoading, error });
 
   if (isLoading) {
     return (

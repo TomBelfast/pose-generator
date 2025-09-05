@@ -165,6 +165,7 @@ const App: React.FC = () => {
           body: JSON.stringify({ count: allPoses.length })
         });
         // Refresh the limit display
+        console.log('🔍 App: Refreshing limit after generation');
         refreshLimit();
       } catch (error) {
         console.error('Error updating generation count:', error);
@@ -252,6 +253,7 @@ const App: React.FC = () => {
               body: JSON.stringify({ count: 1 })
             });
             // Refresh the limit display
+            console.log('🔍 App: Refreshing limit after regeneration');
             refreshLimit();
           } catch (error) {
             console.error('Error updating generation count:', error);

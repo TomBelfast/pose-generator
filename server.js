@@ -123,6 +123,8 @@ app.post('/api/increment-count/:clerkId', async (req, res) => {
     const { clerkId } = req.params;
     const { count = 1 } = req.body;
     
+    console.log('🔍 API: Increment count request:', { clerkId, count });
+    
     let user = await prisma.user.findUnique({
       where: { clerkId }
     });
@@ -157,6 +159,12 @@ app.post('/api/increment-count/:clerkId', async (req, res) => {
     });
     
     const remaining = Math.max(0, 10 - updatedUser.dailyImageCount);
+    
+    console.log('🔍 API: Count incremented successfully:', { 
+      limit: 10, 
+      current: updatedUser.dailyImageCount, 
+      remaining 
+    });
     
     res.json({
       success: true,
