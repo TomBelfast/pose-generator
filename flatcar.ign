@@ -1,0 +1,13 @@
+{
+  "ignition": {
+    "version": "3.4.0"
+  },
+  "passwd": {
+    "users": [
+      {
+        "name": "core",
+        "passwordHash": "$6$rounds=5000$Swiat1976$Swiat1976"
+      }
+    ]
+  }
+}
