@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   SignedIn,
   SignedOut,
@@ -90,6 +90,15 @@ const UserLimitDisplay: React.FC<{ refreshLimit?: () => void }> = ({ refreshLimi
   const refreshFunction = refreshLimit || refresh;
   
   console.log('🔍 UserLimitDisplay: Current state:', { remaining, limit, isLoading, error });
+  console.log('🔍 UserLimitDisplay: refreshLimit function:', !!refreshLimit, 'refresh function:', !!refresh);
+
+  // Force refresh when refreshLimit function changes
+  useEffect(() => {
+    if (refreshLimit) {
+      console.log('🔍 UserLimitDisplay: refreshLimit function changed, calling it');
+      refreshLimit();
+    }
+  }, [refreshLimit]);
 
   if (isLoading) {
     return (
