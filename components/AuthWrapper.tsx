@@ -32,7 +32,7 @@ const clerkAppearance = {
     formFieldSuccessText: 'text-green-400',
     
     // Button styling
-    formButtonPrimary: 'bg-emerald-500 hover:bg-emerald-600 text-white font-medium transition-colors',
+    formButtonPrimary: '!bg-emerald-500 hover:!bg-emerald-600 text-white font-medium transition-colors',
     formButtonSecondary: 'bg-base-300 hover:bg-base-400 text-base-content border-base-300',
     
     // Social buttons
@@ -70,10 +70,10 @@ const clerkAppearance = {
     codeBlock: 'bg-base-300 text-base-content',
     
     // Loading states
-    spinner: 'text-brand-primary',
+    spinner: 'text-emerald-500',
   },
   variables: {
-    colorPrimary: '#4f46e5',
+    colorPrimary: '#10b981',
     colorBackground: '#1f2937',
     colorInputBackground: '#374151',
     colorInputText: '#f9fafb',
