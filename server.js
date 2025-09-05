@@ -1,6 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const prisma = new PrismaClient();
@@ -188,6 +193,17 @@ app.post('/api/increment-count/:clerkId', async (req, res) => {
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'API is running' });
+});
+
+// Serve static files from dist directory
+app.use(express.static(path.join(__dirname, 'dist')));
+
+// Serve index.html for all non-API routes
+app.get('*', (req, res) => {
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'API endpoint not found' });
+  }
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 app.listen(PORT, () => {
