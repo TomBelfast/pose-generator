@@ -199,7 +199,7 @@ app.get('/api/health', (req, res) => {
 app.use(express.static(path.join(__dirname, 'dist')));
 
 // Serve index.html for all non-API routes
-app.get('*', (req, res) => {
+app.get('/*', (req, res) => {
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ error: 'API endpoint not found' });
   }
