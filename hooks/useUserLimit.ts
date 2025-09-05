@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
 
 interface UserLimitData {
@@ -21,7 +21,7 @@ export const useUserLimit = (): UserLimitData => {
     refresh: () => {}
   });
 
-  const fetchUserLimit = async () => {
+  const fetchUserLimit = useCallback(async () => {
     if (!user) {
       setLimitData(prev => ({ ...prev, isLoading: false }));
       return;
@@ -75,11 +75,11 @@ export const useUserLimit = (): UserLimitData => {
         refresh: fetchUserLimit
       });
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchUserLimit();
-  }, [user]);
+  }, [fetchUserLimit]);
 
   return limitData;
 };

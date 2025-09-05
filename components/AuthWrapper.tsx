@@ -11,6 +11,7 @@ import { useUserLimit } from '../hooks/useUserLimit';
 
 interface AuthWrapperProps {
   children: React.ReactNode;
+  refreshLimit?: () => void;
 }
 
 const clerkAppearance = {
@@ -82,8 +83,11 @@ const clerkAppearance = {
   }
 };
 
-const UserLimitDisplay: React.FC = () => {
-  const { remaining, limit, isLoading, error } = useUserLimit();
+const UserLimitDisplay: React.FC<{ refreshLimit?: () => void }> = ({ refreshLimit }) => {
+  const { remaining, limit, isLoading, error, refresh } = useUserLimit();
+  
+  // Use the passed refreshLimit function if available, otherwise use the one from hook
+  const refreshFunction = refreshLimit || refresh;
 
   if (isLoading) {
     return (
@@ -132,7 +136,7 @@ const UserLimitDisplay: React.FC = () => {
   );
 };
 
-const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
+const AuthWrapper: React.FC<AuthWrapperProps> = ({ children, refreshLimit }) => {
   return (
     <div className="min-h-screen bg-base-100">
       {/* Header with authentication controls */}
@@ -147,7 +151,7 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
             
             <div className="flex items-center space-x-4">
               <SignedIn>
-                <UserLimitDisplay />
+                <UserLimitDisplay refreshLimit={refreshLimit} />
                 <UserButton 
                   appearance={clerkAppearance}
                 />

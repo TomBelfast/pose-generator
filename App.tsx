@@ -296,7 +296,7 @@ const App: React.FC = () => {
 
 
   return (
-    <AuthWrapper>
+    <AuthWrapper refreshLimit={refreshLimit}>
       <div className="p-4 sm:p-6 lg:p-8">
         <div className="max-w-7xl mx-auto">
           <header className="text-center mb-8">

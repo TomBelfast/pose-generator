@@ -78,7 +78,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
           </>
         ) : selectedImage && selectedImage.status === 'loading' ? (
           <div className="text-center text-gray-600">
-            <Spinner className="w-12 h-12 mx-auto mb-4" />
+            <Spinner className="w-12 h-12 mx-auto mb-4 text-emerald-500" />
             <p className="text-lg font-medium">Generating...</p>
             <p className="text-sm mt-2">{selectedImage.prompt}</p>
           </div>
@@ -126,7 +126,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
                 >
                 {img.status === 'loading' && (
                     <div className="w-full h-full bg-base-300 flex items-center justify-center rounded-md animate-pulse">
-                        <Spinner className="w-6 h-6 text-gray-400" />
+                        <Spinner className="w-6 h-6 text-emerald-500" />
                     </div>
                 )}
                 {img.status === 'failed' && (
