@@ -52,16 +52,7 @@ export const generateImageFromPose = async (
 
   try {
     console.log("🔍 DEBUG: Sending request to Gemini API...");
-    
-    // Calculate image dimensions based on ratio
-    let width = 1024, height = 1024; // Default square
-    if (ratio === '9:16') {
-      width = 576; height = 1024; // Portrait
-    } else if (ratio === '16:9') {
-      width = 1024; height = 576; // Landscape
-    }
-    
-    console.log("🔍 DEBUG: Image dimensions:", { width, height, ratio });
+    console.log("🔍 DEBUG: Aspect ratio:", ratio);
     
     const response = await ai.models.generateContent({
       model: model,
@@ -70,9 +61,8 @@ export const generateImageFromPose = async (
       },
       config: {
         responseModalities: [Modality.IMAGE, Modality.TEXT],
-        imageConfig: {
-          width: width,
-          height: height
+        parameters: {
+          aspectRatio: ratio
         }
       },
     });
