@@ -99,8 +99,25 @@ export const generateImageFromPose = async (
     console.error("🔍 DEBUG: Error details:", {
       name: error instanceof Error ? error.name : 'Unknown',
       message: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined
+      stack: error instanceof Error ? error.stack : undefined,
+      errorType: typeof error,
+      errorConstructor: error.constructor.name
     });
+    
+    // Log additional error information if available
+    if (error.response) {
+      console.error("🔍 DEBUG: API Response Error:", {
+        status: error.response.status,
+        statusText: error.response.statusText,
+        data: error.response.data
+      });
+    }
+    
+    if (error.request) {
+      console.error("🔍 DEBUG: Request Error:", {
+        request: error.request
+      });
+    }
     
     // If it's a swimming prompt and the first attempt failed, try a simpler approach
     if (posePrompt.toLowerCase().includes('swimming')) {

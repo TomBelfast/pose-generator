@@ -112,9 +112,20 @@ const App: React.FC = () => {
     }));
     setGeneratedImages(initialImages);
 
-    const generationPromises = allPoses.map((prompt, index) => 
-      generateImageFromPose(uploadedImage.base64, uploadedImage.file.type, prompt, selectedRatio)
+    console.log('🔍 App: Starting image generation for poses:', allPoses);
+    console.log('🔍 App: Selected ratio:', selectedRatio);
+    console.log('🔍 App: Uploaded image info:', {
+      hasImage: !!uploadedImage,
+      fileType: uploadedImage?.file?.type,
+      base64Length: uploadedImage?.base64?.length
+    });
+
+    const generationPromises = allPoses.map((prompt, index) => {
+      console.log(`🔍 App: Starting generation ${index + 1}/${allPoses.length} for prompt: "${prompt}"`);
+      
+      return generateImageFromPose(uploadedImage.base64, uploadedImage.file.type, prompt, selectedRatio)
         .then(base64Data => {
+            console.log(`🔍 App: Successfully generated image ${index + 1}/${allPoses.length} for prompt: "${prompt}"`);
             setGenerationProgress(prev => ({ ...prev, current: prev.current + 1 }));
             return {
                 index,
@@ -123,16 +134,16 @@ const App: React.FC = () => {
             };
         })
         .catch(err => {
-            console.error(`Failed to generate image for prompt: "${prompt}"`, err);
+            console.error(`🔍 App: Failed to generate image ${index + 1}/${allPoses.length} for prompt: "${prompt}"`, err);
             setGenerationProgress(prev => ({ ...prev, current: prev.current + 1 }));
             setError(`An error occurred while generating the image for pose: ${prompt}. Please try again.`);
             return {
                 index,
                 status: 'failed' as const,
                 src: null
-            }
-        })
-    );
+            };
+        });
+    });
 
     const results = await Promise.all(generationPromises);
 
