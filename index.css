@@ -37,3 +37,26 @@ html, body {
   background: #4338ca;
 }
 
+/* Custom styles for Clerk SignInButton */
+button[component="SignInButton"] {
+  background-color: #10b981 !important;
+  color: white !important;
+  border: none !important;
+  width: 100% !important;
+  padding: 12px 0 !important;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  font-size: 18px !important;
+  transition: background-color 0.2s ease !important;
+}
+
+button[component="SignInButton"]:hover {
+  background-color: #059669 !important;
+}
+
+button[component="SignInButton"]:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3) !important;
+}
+
+

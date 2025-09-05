@@ -19,37 +19,38 @@ const clerkAppearance = {
     // Modal and container styling
     modalContent: 'bg-base-200 border-base-300 shadow-2xl',
     modalCloseButton: 'text-base-content hover:bg-base-300',
-    modalBackdrop: 'bg-black/50',
+    modalBackdrop: 'bg-base-100/80',
+    
+    // Card styling
+    card: 'bg-white border-gray-300',
     
     // Header styling
-    headerTitle: 'text-base-content font-bold',
-    headerSubtitle: 'text-gray-400',
+    headerTitle: 'text-gray-800 font-bold',
+    headerSubtitle: 'text-gray-600',
     
     // Form styling
-    formFieldInput: 'bg-base-300 border-base-300 text-base-content placeholder-gray-500 focus:border-brand-primary focus:ring-brand-primary',
-    formFieldLabel: 'text-base-content',
-    formFieldErrorText: 'text-red-400',
-    formFieldSuccessText: 'text-green-400',
+    formFieldInput: 'bg-white border-gray-300 text-gray-800 placeholder-gray-500 focus:border-emerald-500 focus:ring-emerald-500',
+    formFieldLabel: 'text-gray-700',
+    formFieldErrorText: 'text-red-600',
+    formFieldSuccessText: 'text-green-600',
     
     // Button styling
-    formButtonPrimary: '!bg-emerald-500 hover:!bg-emerald-600 text-white font-medium transition-colors',
+    formButtonPrimary: '!bg-emerald-500 hover:!bg-emerald-600 !text-white font-medium transition-colors',
+    formButtonPrimaryHover: '!bg-emerald-600',
     formButtonSecondary: 'bg-base-300 hover:bg-base-400 text-base-content border-base-300',
     
     // Social buttons
-    socialButtonsBlockButton: 'bg-base-300 hover:bg-base-400 text-base-content border-base-300 transition-colors',
-    socialButtonsBlockButtonText: 'text-base-content',
+    socialButtonsBlockButton: 'bg-white hover:bg-gray-50 text-gray-700 border-gray-300 transition-colors',
+    socialButtonsBlockButtonText: 'text-gray-700',
     
     // Links and text
-    footerActionLink: 'text-brand-primary hover:text-brand-primary/80 transition-colors',
-    identityPreviewText: 'text-base-content',
-    identityPreviewEditButton: 'text-brand-primary hover:text-brand-primary/80',
+    footerActionLink: 'text-emerald-600 hover:text-emerald-700 transition-colors',
+    identityPreviewText: 'text-gray-700',
+    identityPreviewEditButton: 'text-emerald-600 hover:text-emerald-700',
     
     // Divider
-    dividerLine: 'bg-base-300',
-    dividerText: 'text-gray-400',
-    
-    // Card styling
-    card: 'bg-base-200 border-base-300',
+    dividerLine: 'bg-gray-300',
+    dividerText: 'text-gray-500',
     
     // User button styling
     userButtonPopoverCard: 'bg-base-200 border-base-300 shadow-xl',
@@ -189,15 +190,16 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children, refreshLimit }) => 
                 </p>
               </div>
               
-              <div className="bg-base-200 rounded-lg p-6 border border-base-300">
-                <div className="flex justify-center">
+              <div className="bg-base-200 rounded-lg p-3 border border-base-300">
+                <div className="w-full">
                   <SignInButton 
                     mode="modal"
                     appearance={{
                       ...clerkAppearance,
                       elements: {
                         ...clerkAppearance.elements,
-                        formButtonPrimary: 'bg-emerald-500 hover:bg-emerald-600 text-white font-medium transition-colors',
+                        formButtonPrimary: '!bg-emerald-500 hover:!bg-emerald-600 !text-white font-medium transition-colors',
+                        formButtonPrimaryHover: '!bg-emerald-600',
                       }
                     }}
                   />
