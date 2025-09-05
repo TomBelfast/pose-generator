@@ -1,0 +1,3 @@
+[33mda1c891[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m Fix Express route path error - change '*' to '/*'
+[33m4980528[m[33m ([m[1;31morigin/main[m[33m)[m Fix server.js: Add static file serving for frontend
+[33m0403bca[m Fix Dockerfile: Update Node.js to v20 and install all dependencies for build
