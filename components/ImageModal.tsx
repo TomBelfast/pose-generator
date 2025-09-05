@@ -210,7 +210,7 @@ const ImageModal: React.FC<ImageModalProps> = ({
       >
         {currentImage.status === 'loading' ? (
           <div className="text-center text-white">
-            <Spinner className="w-16 h-16 mx-auto mb-4" />
+            <Spinner className="w-16 h-16 mx-auto mb-4 text-emerald-500" />
             <p className="text-xl font-medium">Regenerating image...</p>
             <p className="text-sm mt-2 opacity-80">{currentImage.prompt}</p>
           </div>

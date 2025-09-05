@@ -80,7 +80,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload, uploadedIm
       />
       {isUploading ? (
         <div className="text-center text-gray-600 p-4">
-          <Spinner className="w-12 h-12 mx-auto mb-4" />
+          <Spinner className="w-12 h-12 mx-auto mb-4 text-emerald-500" />
           <p className="font-semibold">Uploading image...</p>
           <p className="text-sm">Please wait while we process your file</p>
         </div>

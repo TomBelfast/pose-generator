@@ -39,14 +39,14 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
       <div className="relative aspect-square w-full bg-base-200 border-2 border-base-300 rounded-lg flex items-center justify-center">
         {isGenerating ? (
           <div className="text-center text-gray-600">
-            <Spinner className="w-12 h-12 mx-auto mb-4" />
+            <Spinner className="w-12 h-12 mx-auto mb-4 text-emerald-500" />
             <p className="text-lg font-medium">
               Generating {generationProgress.current}/{generationProgress.total} images...
             </p>
             <p className="text-sm mt-2">Please wait while AI creates your poses</p>
             <div className="mt-4 w-full bg-base-300 rounded-full h-2">
               <div 
-                className="bg-brand-primary h-2 rounded-full transition-all duration-300"
+                className="bg-emerald-500 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${(generationProgress.current / generationProgress.total) * 100}%` }}
               />
             </div>
