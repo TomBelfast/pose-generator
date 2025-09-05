@@ -13,8 +13,9 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Generate Prisma client
+# Generate Prisma client and create database
 RUN npx prisma generate
+RUN npx prisma db push
 
 # Build the React app
 RUN npm run build
