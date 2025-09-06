@@ -1,5 +1,0 @@
-{
-  "name": "Pose & Video Generator",
-  "description": "An application for generating character images in various poses using AI, with a video creation simulation feature.",
-  "requestFramePermissions": []
-}

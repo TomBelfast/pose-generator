@@ -1,100 +1,92 @@
-# 🚀 Instrukcje uruchomienia Pose Generator na Coolify
+# Instrukcje Wdrożenia - Pose Generator
 
-## 📋 Status projektu
-- **Projekt istnieje**: `tom-belfast/pose-generator:main-e0k88kocwoo8s44gg00osocg`
-- **Status**: `exited:unhealthy` ❌
-- **Problem**: Projekt jest zatrzymany i wymaga konfiguracji
+## Lokalne uruchomienie
 
-## 🔧 KROK 1: Sprawdź projekt w interfejsie Coolify
+### Wymagania
+- Node.js (wersja 18 lub nowsza)
+- npm lub yarn
 
-1. **Zaloguj się** do [https://host.aihub.ovh/](https://host.aihub.ovh/)
-2. **Znajdź projekt** `pose-generator` na liście aplikacji
-3. **Kliknij na projekt** aby go otworzyć
+### Instalacja i uruchomienie
 
-## 🔧 KROK 2: Sprawdź konfigurację
+1. **Zainstaluj zależności:**
+   ```bash
+   npm install
+   ```
 
-### A. Zmienne środowiskowe
-Upewnij się, że są ustawione:
-```
-VITE_GEMINI_API_KEY=twój_klucz_gemini
-VITE_CLERK_PUBLISHABLE_KEY=pk_live_twój_klucz_clerk
-DATABASE_URL=file:/app/data/production.db
-NODE_ENV=production
-PORT=4999
-```
+2. **Skonfiguruj zmienne środowiskowe:**
+   - Skopiuj `env.example` do `.env.local`
+   - Ustaw `VITE_GEMINI_API_KEY` na swój klucz API Gemini
+   - Ustaw `VITE_CLERK_PUBLISHABLE_KEY` na swój klucz Clerk
 
-### B. Port
-- **Port**: `4999`
-- **Dockerfile**: `./Dockerfile`
+3. **Uruchom aplikację:**
+   ```bash
+   # Uruchom tylko frontend
+   npm run dev
+   
+   # Uruchom pełną aplikację (frontend + backend)
+   npm run dev:full
+   ```
 
-### C. Repozytorium
-- **URL**: Twoje repozytorium Git z kodem
-- **Branch**: `main`
+4. **Otwórz aplikację:**
+   - Frontend: http://localhost:5173
+   - Backend API: http://localhost:4999
 
-## 🔧 KROK 3: Uruchom projekt
+## Wdrożenie produkcyjne
 
-### Opcja A: Restart istniejącego projektu
-1. **Kliknij "Restart"** w interfejsie Coolify
-2. **Sprawdź logi** podczas uruchamiania
-3. **Sprawdź status** po uruchomieniu
+### Docker
 
-### Opcja B: Redeploy projektu
-1. **Kliknij "Redeploy"** w interfejsie Coolify
-2. **Obserwuj proces** budowania
-3. **Sprawdź logi** po wdrożeniu
+1. **Zbuduj obraz:**
+   ```bash
+   docker build -t pose-generator .
+   ```
 
-### Opcja C: Utwórz nowy projekt
-1. **Kliknij "New Application"**
-2. **Wybierz "Git Repository"**
-3. **Podaj URL repozytorium**
-4. **Skonfiguruj** jak powyżej
+2. **Uruchom kontener:**
+   ```bash
+   docker run -p 4999:4999 \
+     -e VITE_GEMINI_API_KEY=your_key \
+     -e VITE_CLERK_PUBLISHABLE_KEY=your_key \
+     pose-generator
+   ```
 
-## 🔧 KROK 4: Sprawdź logi
+### Docker Compose
 
-Po uruchomieniu sprawdź logi pod kątem:
-- ✅ **Brak błędów** podczas budowania
-- ✅ **Aplikacja startuje** na porcie 4999
-- ✅ **Baza danych** jest dostępna
-- ✅ **Zmienne środowiskowe** są ustawione
+1. **Uruchom z docker-compose:**
+   ```bash
+   docker-compose up -d
+   ```
 
-## 🔧 KROK 5: Test aplikacji
+2. **Sprawdź status:**
+   ```bash
+   docker-compose ps
+   docker-compose logs -f
+   ```
 
-Po uruchomieniu sprawdź:
-- **URL aplikacji** (podany przez Coolify)
-- **Health check** na `/api/health`
-- **Funkcjonalność** generowania obrazów
+## Struktura projektu
 
-## 🐛 Rozwiązywanie problemów
+- `App.tsx` - Główny komponent aplikacji
+- `server.js` - Backend Express.js
+- `components/` - Komponenty React
+- `services/` - Serwisy (np. Gemini API)
+- `prisma/` - Konfiguracja bazy danych
+- `hooks/` - Custom React hooks
 
-### Problem: Aplikacja nie startuje
-- **Sprawdź logi** - co spowodowało błąd
-- **Sprawdź zmienne środowiskowe** - czy są ustawione
-- **Sprawdź port** - czy 4999 jest dostępny
+## API Endpoints
 
-### Problem: Błąd bazy danych
-- **Sprawdź** czy persistent volume jest skonfigurowany
-- **Sprawdź** czy katalog `/app/data` istnieje
+- `GET /api/health` - Health check
+- `POST /api/generate` - Generowanie obrazów z pozami
+- `GET /api/poses` - Lista dostępnych poz
 
-### Problem: Błąd autoryzacji
-- **Sprawdź** klucze Clerk i Gemini
-- **Sprawdź** czy są w formacie produkcyjnym
+## Rozwiązywanie problemów
 
-## 📊 Monitoring
+### Aplikacja nie uruchamia się
+- Sprawdź czy wszystkie zmienne środowiskowe są ustawione
+- Upewnij się, że porty 5173 i 4999 są wolne
+- Sprawdź logi: `npm run dev:full`
 
-Po uruchomieniu monitoruj:
-- **Status aplikacji** w Coolify
-- **Logi** w czasie rzeczywistym
-- **Metryki** użycia zasobów
-- **Health status** aplikacji
+### Błędy API
+- Sprawdź czy klucz Gemini API jest prawidłowy
+- Sprawdź logi serwera w konsoli
 
-## 🎯 Oczekiwany rezultat
-
-Po pomyślnym uruchomieniu:
-- **Status**: `running:healthy` ✅
-- **Port**: 4999
-- **URL**: Dostępny przez Coolify
-- **Funkcjonalność**: Generowanie obrazów działa
-
----
-
-**Powodzenia z uruchomieniem! 🎉**
+### Problemy z bazą danych
+- Uruchom: `npx prisma db push`
+- Sprawdź czy plik bazy danych ma odpowiednie uprawnienia

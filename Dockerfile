@@ -13,11 +13,16 @@ RUN npm ci
 # Copy source code
 COPY . .
 
+# Set environment variables for Prisma and Vite build
+ENV DATABASE_URL="file:/app/data/production.db"
+ENV VITE_GEMINI_API_KEY="eJiOmRRZiVAQSOhSZzLDyALzc"
+ENV VITE_CLERK_PUBLISHABLE_KEY="pk_test_ZW5hYmxlZC1kb3ZlLTk1LmNsZXJrLmFjY291bnRzLmRldiQ"
+
 # Generate Prisma client and create database
 RUN npx prisma generate
 RUN npx prisma db push
 
-# Build the React app
+# Build the React app with environment variables
 RUN npm run build
 
 # Production stage

@@ -1,3 +1,23 @@
-[33mda1c891[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m Fix Express route path error - change '*' to '/*'
-[33m4980528[m[33m ([m[1;31morigin/main[m[33m)[m Fix server.js: Add static file serving for frontend
-[33m0403bca[m Fix Dockerfile: Update Node.js to v20 and install all dependencies for build
+warning: in the working copy of 'Dockerfile', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/Dockerfile b/Dockerfile[m
+[1mindex e7dbcb8..695748e 100644[m
+[1m--- a/Dockerfile[m
+[1m+++ b/Dockerfile[m
+[36m@@ -13,11 +13,16 @@[m [mRUN npm ci[m
+ # Copy source code[m
+ COPY . .[m
+ [m
+[32m+[m[32m# Set environment variables for Prisma and Vite build[m
+[32m+[m[32mENV DATABASE_URL="file:/app/data/production.db"[m
+[32m+[m[32mENV VITE_GEMINI_API_KEY="eJiOmRRZiVAQSOhSZzLDyALzc"[m
+[32m+[m[32mENV VITE_CLERK_PUBLISHABLE_KEY="pk_test_ZW5hYmxlZC1kb3ZlLTk1LmNsZXJrLmFjY291bnRzLmRldiQ"[m
+[32m+[m
+ # Generate Prisma client and create database[m
+ RUN npx prisma generate[m
+ RUN npx prisma db push[m
+ [m
+[31m-# Build the React app[m
+[32m+[m[32m# Build the React app with environment variables[m
+ RUN npm run build[m
+ [m
+ # Production stage[m
