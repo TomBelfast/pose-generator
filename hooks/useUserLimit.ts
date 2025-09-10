@@ -34,7 +34,7 @@ export const useUserLimit = (): UserLimitData => {
       
       // First, ensure user exists in our database
       console.log('🔍 useUserLimit: Creating/updating user in database');
-      await fetch('http://localhost:3001/api/user', {
+      await fetch('http://localhost:4999/api/user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -47,7 +47,7 @@ export const useUserLimit = (): UserLimitData => {
 
       // Then get the limit data
       console.log('🔍 useUserLimit: Getting limit data');
-      const response = await fetch(`http://localhost:3001/api/user-limit/${user.id}`);
+      const response = await fetch(`http://localhost:4999/api/user-limit/${user.id}`);
       const data = await response.json();
       console.log('🔍 useUserLimit: API response:', data);
 

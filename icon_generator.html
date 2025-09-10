@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Ikon Biegania</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .icon-card {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+        .icon-card:hover {
+            border-color: #4f46e5;
+        }
+        .icon-card.selected {
+            border-color: #10b981;
+            background: #1f2937;
+        }
+        .icon-preview {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 10px;
+            stroke: none;
+            stroke-width: 0;
+            fill: currentColor;
+        }
+        .icon-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .icon-description {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+        .selected-icon {
+            margin-top: 30px;
+            padding: 20px;
+            background: #1f2937;
+            border-radius: 8px;
+            border: 2px solid #10b981;
+        }
+        .code-output {
+            background: #000;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+        button {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #4338ca;
+        }
+        button:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+        }
+        .generate-section {
+            background: #1f2937;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 2px solid #374151;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #4f46e5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <h1>🏃 Generator Ikon Biegania</h1>
+    <p>Kliknij na ikonę, aby ją wybrać i zobaczyć kod SVG</p>
+    
+    <div class="generate-section">
+        <h3>🎨 Generuj nowe warianty</h3>
+        <p>Kliknij przycisk poniżej, aby wygenerować 5 nowych wariantów ikon biegania:</p>
+        <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px;">
+            <button onclick="generateNewVariants()" id="generateBtn">
+                <span id="generateText">🎲 Generuj nowe warianty</span>
+                <span id="generateLoading" class="loading" style="display: none;"></span>
+            </button>
+            <button onclick="resetToOriginal()" style="background: #6b7280;">🔄 Przywróć oryginalne</button>
+        </div>
+        <div style="display: flex; gap: 20px; font-size: 14px; color: #9ca3af;">
+            <span>📊 Wygenerowano: <span id="generationCount">0</span> zestawów</span>
+            <span>🎯 Łącznie ikon: <span id="totalIcons">5</span></span>
+        </div>
+    </div>
+    
+    <div class="icon-grid" id="iconGrid">
+        <!-- Ikony będą dodane przez JavaScript -->
+    </div>
+    
+    <div class="selected-icon" id="selectedIcon" style="display: none;">
+        <h3>Wybrana ikona:</h3>
+        <div id="selectedPreview"></div>
+        <div class="code-output" id="codeOutput"></div>
+        <button onclick="copyCode()">📋 Kopiuj kod</button>
+        <button onclick="downloadSVG()">💾 Pobierz SVG</button>
+    </div>
+
+    <script>
+        const runningIcons = [
+            {
+                name: "Dynamic Running",
+                description: "Obecny styl - dynamiczne bieganie",
+                svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="6.5" cy="4.5" r="2.5"></circle>
+    <path d="M14 11l-2.5 2.5-4-4-2.5 2.5"></path>
+    <path d="M10 20l-1.5-4-4-1"></path>
+    <path d="M19 14l-4 4-3-2"></path>
+</svg>`
+            },
+            {
+                name: "Sprint Style",
+                description: "Sprint z podniesionymi kolanami",
+                svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="7" cy="4" r="2"></circle>
+    <path d="M7 6v6"></path>
+    <path d="M5 12l2 2 4-4"></path>
+    <path d="M15 8l2-2 2 2"></path>
+    <path d="M17 6v8"></path>
+    <path d="M19 14l-2 2-2-2"></path>
+</svg>`
+            },
+            {
+                name: "Arms Extended",
+                description: "Bieganie z wyciągniętymi ramionami",
+                svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="5" r="2.5"></circle>
+    <path d="M12 7.5v8"></path>
+    <path d="M8 12l-2 2 2 2"></path>
+    <path d="M16 12l2 2-2 2"></path>
+    <path d="M6 18l3-3 3 3"></path>
+    <path d="M18 18l-3-3-3 3"></path>
+</svg>`
+            },
+            {
+                name: "Forward Lean",
+                description: "Bieganie z pochyleniem do przodu",
+                svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="8" cy="6" r="2"></circle>
+    <path d="M8 8l-1 2 1 2"></path>
+    <path d="M12 10l2-1 2 1"></path>
+    <path d="M16 8v6"></path>
+    <path d="M18 14l-2 2-2-2"></path>
+    <path d="M6 16l2 2 2-2"></path>
+</svg>`
+            },
+            {
+                name: "Wide Stride",
+                description: "Bieganie z szerokimi krokami",
+                svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="10" cy="4" r="2"></circle>
+    <path d="M10 6v8"></path>
+    <path d="M6 14l2-2 2 2"></path>
+    <path d="M14 14l-2-2 2-2"></path>
+    <path d="M18 16l-2 2-2-2"></path>
+    <path d="M2 16l2 2 2-2"></path>
+</svg>`
+            }
+        ];
+
+        let selectedIcon = null;
+        let currentIcons = [...runningIcons]; // Kopia oryginalnych ikon
+        let generationCount = 0;
+
+        // Funkcje do generowania nowych wariantów - stylizowane emoji-style pozycje
+        function generateEmojiStylePoses() {
+            const poses = [
+                // Pozycja 1: Emoji-style bieganie - lewa noga z przodu, prawa ramię z przodu
+                () => {
+                    return `<circle cx="12" cy="4" r="3" fill="#FFD700"></circle>
+    <rect x="10" y="7" width="4" height="8" fill="#FFD700" rx="1"></rect>
+    <rect x="7" y="8" width="3" height="6" fill="#FFD700" rx="1"></rect>
+    <rect x="14" y="8" width="3" height="6" fill="#FFD700" rx="1"></rect>
+    <rect x="8" y="15" width="2" height="7" fill="#FFD700" rx="1"></rect>
+    <rect x="14" y="15" width="2" height="7" fill="#FFD700" rx="1"></rect>
+    <rect x="6" y="22" width="3" height="2" fill="#8B4513" rx="1"></rect>
+    <rect x="15" y="22" width="3" height="2" fill="#8B4513" rx="1"></rect>
+    <circle cx="10" cy="3" r="1" fill="#000"></circle>
+    <circle cx="14" cy="3" r="1" fill="#000"></circle>
+    <path d="M9 5 Q12 6 15 5" stroke="#000" stroke-width="1" fill="none"></path>
+    <rect x="9" y="6" width="6" height="2" fill="#FF6B6B" rx="1"></rect>`;
+                },
+                
+                // Pozycja 2: Emoji-style bieganie - prawa noga z przodu, lewa ramię z przodu
+                () => {
+                    return `<circle cx="12" cy="4" r="3" fill="#FFD700"></circle>
+    <rect x="10" y="7" width="4" height="8" fill="#FFD700" rx="1"></rect>
+    <rect x="7" y="8" width="3" height="6" fill="#FFD700" rx="1"></rect>
+    <rect x="14" y="8" width="3" height="6" fill="#FFD700" rx="1"></rect>
+    <rect x="8" y="15" width="2" height="7" fill="#FFD700" rx="1"></rect>
+    <rect x="14" y="15" width="2" height="7" fill="#FFD700" rx="1"></rect>
+    <rect x="6" y="22" width="3" height="2" fill="#8B4513" rx="1"></rect>
+    <rect x="15" y="22" width="3" height="2" fill="#8B4513" rx="1"></rect>
+    <circle cx="10" cy="3" r="1" fill="#000"></circle>
+    <circle cx="14" cy="3" r="1" fill="#000"></circle>
+    <path d="M9 5 Q12 6 15 5" stroke="#000" stroke-width="1" fill="none"></path>
+    <rect x="9" y="6" width="6" height="2" fill="#4ECDC4" rx="1"></rect>`;
+                },
+                
+                // Pozycja 3: Emoji-style sprint - wysoki krok, ramiona w górę
+                () => {
+                    return `<circle cx="12" cy="3" r="3" fill="#FFD700"></circle>
+    <rect x="10" y="6" width="4" height="7" fill="#FFD700" rx="1"></rect>
+    <rect x="6" y="7" width="3" height="7" fill="#FFD700" rx="1"></rect>
+    <rect x="15" y="7" width="3" height="7" fill="#FFD700" rx="1"></rect>
+    <rect x="8" y="14" width="2" height="6" fill="#FFD700" rx="1"></rect>
+    <rect x="14" y="14" width="2" height="6" fill="#FFD700" rx="1"></rect>
+    <rect x="6" y="20" width="3" height="2" fill="#8B4513" rx="1"></rect>
+    <rect x="15" y="20" width="3" height="2" fill="#8B4513" rx="1"></rect>
+    <circle cx="10" cy="2" r="1" fill="#000"></circle>
+    <circle cx="14" cy="2" r="1" fill="#000"></circle>
+    <path d="M9 4 Q12 5 15 4" stroke="#000" stroke-width="1" fill="none"></path>
+    <rect x="9" y="5" width="6" height="2" fill="#45B7D1" rx="1"></rect>`;
+                },
+                
+                // Pozycja 4: Emoji-style bieganie z pochyleniem do przodu
+                () => {
+                    return `<circle cx="12" cy="4" r="3" fill="#FFD700"></circle>
+    <rect x="10" y="7" width="4" height="8" fill="#FFD700" rx="1"></rect>
+    <rect x="7" y="8" width="3" height="6" fill="#FFD700" rx="1"></rect>
+    <rect x="14" y="8" width="3" height="6" fill="#FFD700" rx="1"></rect>
+    <rect x="8" y="15" width="2" height="7" fill="#FFD700" rx="1"></rect>
+    <rect x="14" y="15" width="2" height="7" fill="#FFD700" rx="1"></rect>
+    <rect x="6" y="22" width="3" height="2" fill="#8B4513" rx="1"></rect>
+    <rect x="15" y="22" width="3" height="2" fill="#8B4513" rx="1"></rect>
+    <circle cx="10" cy="3" r="1" fill="#000"></circle>
+    <circle cx="14" cy="3" r="1" fill="#000"></circle>
+    <path d="M9 5 Q12 6 15 5" stroke="#000" stroke-width="1" fill="none"></path>
+    <rect x="9" y="6" width="6" height="2" fill="#96CEB4" rx="1"></rect>`;
+                },
+                
+                // Pozycja 5: Emoji-style bieganie z wyciągniętymi ramionami
+                () => {
+                    return `<circle cx="12" cy="4" r="3" fill="#FFD700"></circle>
+    <rect x="10" y="7" width="4" height="8" fill="#FFD700" rx="1"></rect>
+    <rect x="5" y="8" width="3" height="6" fill="#FFD700" rx="1"></rect>
+    <rect x="16" y="8" width="3" height="6" fill="#FFD700" rx="1"></rect>
+    <rect x="8" y="15" width="2" height="7" fill="#FFD700" rx="1"></rect>
+    <rect x="14" y="15" width="2" height="7" fill="#FFD700" rx="1"></rect>
+    <rect x="6" y="22" width="3" height="2" fill="#8B4513" rx="1"></rect>
+    <rect x="15" y="22" width="3" height="2" fill="#8B4513" rx="1"></rect>
+    <circle cx="10" cy="3" r="1" fill="#000"></circle>
+    <circle cx="14" cy="3" r="1" fill="#000"></circle>
+    <path d="M9 5 Q12 6 15 5" stroke="#000" stroke-width="1" fill="none"></path>
+    <rect x="9" y="6" width="6" height="2" fill="#FECA57" rx="1"></rect>`;
+                },
+                
+                // Pozycja 6: Emoji-style bieganie z szerokimi krokami
+                () => {
+                    return `<circle cx="12" cy="4" r="3" fill="#FFD700"></circle>
+    <rect x="10" y="7" width="4" height="8" fill="#FFD700" rx="1"></rect>
+    <rect x="7" y="8" width="3" height="6" fill="#FFD700" rx="1"></rect>
+    <rect x="14" y="8" width="3" height="6" fill="#FFD700" rx="1"></rect>
+    <rect x="6" y="15" width="2" height="7" fill="#FFD700" rx="1"></rect>
+    <rect x="16" y="15" width="2" height="7" fill="#FFD700" rx="1"></rect>
+    <rect x="4" y="22" width="3" height="2" fill="#8B4513" rx="1"></rect>
+    <rect x="17" y="22" width="3" height="2" fill="#8B4513" rx="1"></rect>
+    <circle cx="10" cy="3" r="1" fill="#000"></circle>
+    <circle cx="14" cy="3" r="1" fill="#000"></circle>
+    <path d="M9 5 Q12 6 15 5" stroke="#000" stroke-width="1" fill="none"></path>
+    <rect x="9" y="6" width="6" height="2" fill="#FF9FF3" rx="1"></rect>`;
+                },
+                
+                // Pozycja 7: Emoji-style bieganie z podniesionymi kolanami
+                () => {
+                    return `<circle cx="12" cy="3" r="3" fill="#FFD700"></circle>
+    <rect x="10" y="6" width="4" height="7" fill="#FFD700" rx="1"></rect>
+    <rect x="7" y="7" width="3" height="7" fill="#FFD700" rx="1"></rect>
+    <rect x="14" y="7" width="3" height="7" fill="#FFD700" rx="1"></rect>
+    <rect x="8" y="14" width="2" height="6" fill="#FFD700" rx="1"></rect>
+    <rect x="14" y="14" width="2" height="6" fill="#FFD700" rx="1"></rect>
+    <rect x="6" y="20" width="3" height="2" fill="#8B4513" rx="1"></rect>
+    <rect x="15" y="20" width="3" height="2" fill="#8B4513" rx="1"></rect>
+    <circle cx="10" cy="2" r="1" fill="#000"></circle>
+    <circle cx="14" cy="2" r="1" fill="#000"></circle>
+    <path d="M9 4 Q12 5 15 4" stroke="#000" stroke-width="1" fill="none"></path>
+    <rect x="9" y="5" width="6" height="2" fill="#54A0FF" rx="1"></rect>`;
+                },
+                
+                // Pozycja 8: Emoji-style bieganie z ramionami w górę
+                () => {
+                    return `<circle cx="12" cy="4" r="3" fill="#FFD700"></circle>
+    <rect x="10" y="7" width="4" height="8" fill="#FFD700" rx="1"></rect>
+    <rect x="7" y="8" width="3" height="6" fill="#FFD700" rx="1"></rect>
+    <rect x="14" y="8" width="3" height="6" fill="#FFD700" rx="1"></rect>
+    <rect x="8" y="15" width="2" height="7" fill="#FFD700" rx="1"></rect>
+    <rect x="14" y="15" width="2" height="7" fill="#FFD700" rx="1"></rect>
+    <rect x="6" y="22" width="3" height="2" fill="#8B4513" rx="1"></rect>
+    <rect x="15" y="22" width="3" height="2" fill="#8B4513" rx="1"></rect>
+    <circle cx="10" cy="3" r="1" fill="#000"></circle>
+    <circle cx="14" cy="3" r="1" fill="#000"></circle>
+    <path d="M9 5 Q12 6 15 5" stroke="#000" stroke-width="1" fill="none"></path>
+    <rect x="9" y="6" width="6" height="2" fill="#5F27CD" rx="1"></rect>`;
+                }
+            ];
+            
+            return poses[Math.floor(Math.random() * poses.length)]();
+        }
+
+        function generateNewVariants() {
+            const btn = document.getElementById('generateBtn');
+            const text = document.getElementById('generateText');
+            const loading = document.getElementById('generateLoading');
+            
+            // Pokaż loading
+            btn.disabled = true;
+            text.style.display = 'none';
+            loading.style.display = 'inline-block';
+            
+            // Symuluj czas generowania
+            setTimeout(() => {
+                // Wygeneruj nowe warianty
+                const newVariants = [];
+                const styles = ['Dynamic', 'Sprint', 'Marathon', 'Jogging', 'Racing'];
+                
+                for (let i = 0; i < 5; i++) {
+                    const paths = generateEmojiStylePoses();
+                    const svg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+    ${paths}
+</svg>`;
+                    
+                    newVariants.push({
+                        name: `${styles[i]} Running`,
+                        description: `Nowy wariant ${i + 1} - ${styles[i].toLowerCase()} style`,
+                        svg: svg
+                    });
+                }
+                
+                // Zastąp obecne ikony
+                currentIcons = newVariants;
+                selectedIcon = null;
+                generationCount++;
+                
+                // Przerenderuj
+                renderIcons();
+                document.getElementById('selectedIcon').style.display = 'none';
+                
+                // Aktualizuj statystyki
+                updateStats();
+                
+                // Ukryj loading
+                btn.disabled = false;
+                text.style.display = 'inline';
+                loading.style.display = 'none';
+                
+                // Pokaż komunikat
+                showNotification(`✅ Wygenerowano 5 nowych wariantów! (Zestaw ${generationCount})`);
+                
+            }, 1500); // 1.5 sekundy loading
+        }
+
+        function resetToOriginal() {
+            currentIcons = [...runningIcons];
+            selectedIcon = null;
+            generationCount = 0;
+            renderIcons();
+            document.getElementById('selectedIcon').style.display = 'none';
+            updateStats();
+            showNotification('🔄 Przywrócono oryginalne ikony');
+        }
+
+        function updateStats() {
+            document.getElementById('generationCount').textContent = generationCount;
+            document.getElementById('totalIcons').textContent = currentIcons.length;
+        }
+
+        function showNotification(message) {
+            // Utwórz element powiadomienia
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #10b981;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                z-index: 1000;
+                font-weight: 500;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                animation: slideIn 0.3s ease-out;
+            `;
+            notification.textContent = message;
+            
+            // Dodaj style animacji
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(notification);
+            
+            // Usuń po 3 sekundach
+            setTimeout(() => {
+                notification.style.animation = 'slideIn 0.3s ease-out reverse';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                    document.head.removeChild(style);
+                }, 300);
+            }, 3000);
+        }
+
+        function renderIcons() {
+            const grid = document.getElementById('iconGrid');
+            grid.innerHTML = '';
+
+            currentIcons.forEach((icon, index) => {
+                const card = document.createElement('div');
+                card.className = 'icon-card';
+                card.innerHTML = `
+                    <div class="icon-preview">${icon.svg}</div>
+                    <div class="icon-name">${icon.name}</div>
+                    <div class="icon-description">${icon.description}</div>
+                `;
+                
+                card.onclick = () => selectIcon(index);
+                grid.appendChild(card);
+            });
+        }
+
+        function selectIcon(index) {
+            // Usuń poprzedni wybór
+            document.querySelectorAll('.icon-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // Zaznacz nowy
+            document.querySelectorAll('.icon-card')[index].classList.add('selected');
+            
+            selectedIcon = currentIcons[index];
+            showSelectedIcon();
+        }
+
+        function showSelectedIcon() {
+            const container = document.getElementById('selectedIcon');
+            const preview = document.getElementById('selectedPreview');
+            const code = document.getElementById('codeOutput');
+
+            container.style.display = 'block';
+            preview.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="width: 48px; height: 48px;">${selectedIcon.svg}</div>
+                    <div>
+                        <h4 style="margin: 0;">${selectedIcon.name}</h4>
+                        <p style="margin: 5px 0 0 0; color: #9ca3af;">${selectedIcon.description}</p>
+                    </div>
+                </div>
+            `;
+
+            const reactComponent = `const RunningIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  ${selectedIcon.svg.replace(/\n/g, '\n  ')}
+);`;
+
+            code.textContent = reactComponent;
+        }
+
+        function copyCode() {
+            const code = document.getElementById('codeOutput').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Kod skopiowany do schowka!');
+            });
+        }
+
+        function downloadSVG() {
+            const svgContent = selectedIcon.svg;
+            const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${selectedIcon.name.toLowerCase().replace(/\s+/g, '_')}.svg`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Inicjalizacja
+        renderIcons();
+        updateStats();
+    </script>
+</body>
+</html>

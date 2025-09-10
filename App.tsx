@@ -3,7 +3,6 @@ import ImageUploader from './components/ImageUploader';
 import PoseSelector from './components/PoseSelector';
 import ResultsPanel from './components/ResultsPanel';
 import ImageModal from './components/ImageModal';
-import RatioSelector, { type ImageRatio } from './components/RatioSelector';
 import AuthWrapper from './components/AuthWrapper';
 import { generateImageFromPose } from './services/geminiService';
 import type { GeneratedImage } from './types';
@@ -25,7 +24,6 @@ const App: React.FC = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUploading, setIsUploading] = useState<boolean>(false);
-  const [selectedRatio, setSelectedRatio] = useState<ImageRatio>('1:1');
 
   const handleImageUpload = (file: File) => {
     setIsUploading(true);
@@ -84,7 +82,7 @@ const App: React.FC = () => {
     // Check user limit before generating
     if (user) {
       try {
-        const response = await fetch(`http://localhost:3001/api/user-limit/${user.id}`);
+        const response = await fetch(`http://localhost:4999/api/user-limit/${user.id}`);
         const data = await response.json();
         
         if (data.success && data.remaining < allPoses.length) {
@@ -113,7 +111,6 @@ const App: React.FC = () => {
     setGeneratedImages(initialImages);
 
     console.log('🔍 App: Starting image generation for poses:', allPoses);
-    console.log('🔍 App: Selected ratio:', selectedRatio);
     console.log('🔍 App: Uploaded image info:', {
       hasImage: !!uploadedImage,
       fileType: uploadedImage?.file?.type,
@@ -123,7 +120,7 @@ const App: React.FC = () => {
     const generationPromises = allPoses.map((prompt, index) => {
       console.log(`🔍 App: Starting generation ${index + 1}/${allPoses.length} for prompt: "${prompt}"`);
       
-      return generateImageFromPose(uploadedImage.base64, uploadedImage.file.type, prompt, selectedRatio)
+      return generateImageFromPose(uploadedImage.base64, uploadedImage.file.type, prompt, '1:1')
         .then(base64Data => {
             console.log(`🔍 App: Successfully generated image ${index + 1}/${allPoses.length} for prompt: "${prompt}"`);
             setGenerationProgress(prev => ({ ...prev, current: prev.current + 1 }));
@@ -168,7 +165,7 @@ const App: React.FC = () => {
     // Update user's generation count
     if (user) {
       try {
-        await fetch(`http://localhost:3001/api/increment-count/${user.id}`, {
+        await fetch(`http://localhost:4999/api/increment-count/${user.id}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -209,7 +206,7 @@ const App: React.FC = () => {
       // Check user limit before regenerating
       if (user) {
         try {
-          const response = await fetch(`http://localhost:3001/api/user-limit/${user.id}`);
+          const response = await fetch(`http://localhost:4999/api/user-limit/${user.id}`);
           const data = await response.json();
           
           if (data.success && data.remaining < 1) {
@@ -239,7 +236,7 @@ const App: React.FC = () => {
           uploadedImage.base64, 
           uploadedImage.file.type, 
           currentImage.prompt,
-          selectedRatio
+          '1:1'
         );
         
         // Update with new image
@@ -256,7 +253,7 @@ const App: React.FC = () => {
         // Update user's generation count
         if (user) {
           try {
-            await fetch(`http://localhost:3001/api/increment-count/${user.id}`, {
+            await fetch(`http://localhost:4999/api/increment-count/${user.id}`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -336,10 +333,6 @@ const App: React.FC = () => {
                 uploadedImagePreview={uploadedImagePreview}
                 onImageRemove={handleImageRemove}
                 isUploading={isUploading}
-            />
-            <RatioSelector 
-                selectedRatio={selectedRatio}
-                onRatioChange={setSelectedRatio}
             />
             <PoseSelector 
                 selectedPoses={selectedPoses}

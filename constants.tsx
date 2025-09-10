@@ -99,6 +99,68 @@ const SquattingIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   </svg>
 );
 
+const ParachuteIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="4" r="2"></circle>
+    <path d="M12 6v8"></path>
+    <path d="M8 14l4 4 4-4"></path>
+    <path d="M4 12l8-2 8 2"></path>
+    <path d="M6 16l2 2"></path>
+    <path d="M18 16l-2 2"></path>
+  </svg>
+);
+
+const WingsuitIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="4" r="2"></circle>
+    <path d="M12 6v8"></path>
+    <path d="M8 12l4 4 4-4"></path>
+    <path d="M4 10l8-2 8 2"></path>
+    <path d="M6 14l2 2"></path>
+    <path d="M18 14l-2 2"></path>
+    <path d="M10 16l2 2 2-2"></path>
+  </svg>
+);
+
+const ClimbingIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="4" r="2"></circle>
+    <path d="M12 6v8"></path>
+    <path d="M8 12l2 2 2-2"></path>
+    <path d="M6 16l2 2 2-2"></path>
+    <path d="M10 18l2 2 2-2"></path>
+    <path d="M4 14l2 2"></path>
+    <path d="M20 14l-2 2"></path>
+  </svg>
+);
+
+const ZiplineIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="4" r="2"></circle>
+    <path d="M12 6v8"></path>
+    <path d="M8 12l4 4 4-4"></path>
+    <path d="M4 10l8-2 8 2"></path>
+    <path d="M6 16l2 2"></path>
+    <path d="M18 16l-2 2"></path>
+    <path d="M2 8l4 2"></path>
+    <path d="M22 8l-4 2"></path>
+  </svg>
+);
+
+const DivingIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="6" r="2"></circle>
+    <path d="M12 8v8"></path>
+    <path d="M8 12l4 4 4-4"></path>
+    <path d="M4 10l8-2 8 2"></path>
+    <path d="M6 16l2 2"></path>
+    <path d="M18 16l-2 2"></path>
+    <circle cx="8" cy="18" r="1"></circle>
+    <circle cx="16" cy="18" r="1"></circle>
+    <circle cx="12" cy="20" r="1"></circle>
+  </svg>
+);
+
 
 export const PREDEFINED_POSES: Pose[] = [
   { name: 'a character in a dynamic running pose', label: 'Running', icon: RunningIcon },
@@ -111,4 +173,9 @@ export const PREDEFINED_POSES: Pose[] = [
   { name: 'a character in a calm yoga pose (e.g., tree pose)', label: 'Yoga', icon: YogaIcon },
   { name: 'a character stretching their arms and legs', label: 'Stretching', icon: StretchingIcon },
   { name: 'a character in a deep squatting position', label: 'Squatting', icon: SquattingIcon },
+  { name: 'a character skydiving with a parachute, arms spread wide', label: 'Parachute', icon: ParachuteIcon },
+  { name: 'a character flying in a wingsuit, arms and legs extended', label: 'Wingsuit', icon: WingsuitIcon },
+  { name: 'a character rock climbing on a mountain face, gripping holds', label: 'Climbing', icon: ClimbingIcon },
+  { name: 'a character ziplining through the air, holding onto a cable', label: 'Zipline', icon: ZiplineIcon },
+  { name: 'a character scuba diving among coral reefs, exploring underwater', label: 'Diving', icon: DivingIcon },
 ];
