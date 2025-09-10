@@ -4,7 +4,7 @@ import PoseSelector from './components/PoseSelector';
 import ResultsPanel from './components/ResultsPanel';
 import ImageModal from './components/ImageModal';
 import AuthWrapper from './components/AuthWrapper';
-import { generateImageFromPose } from './services/geminiService';
+import { generateImageFromPose, getApiStatus } from './services/geminiService';
 import type { GeneratedImage } from './types';
 import { Github, Zap } from 'lucide-react';
 import { useUser } from '@clerk/clerk-react';
@@ -24,6 +24,7 @@ const App: React.FC = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [apiStatus, setApiStatus] = useState<any>(null);
 
   const handleImageUpload = (file: File) => {
     setIsUploading(true);
@@ -78,6 +79,9 @@ const App: React.FC = () => {
 
   const handleGenerate = async () => {
     if (!uploadedImage || allPoses.length === 0) return;
+    
+    // Update API status
+    setApiStatus(getApiStatus());
     
     // Check user limit before generating
     if (user) {
@@ -322,6 +326,25 @@ const App: React.FC = () => {
                 <strong className="font-bold">Error! </strong>
                 <span className="block sm:inline">{error}</span>
             </div>
+        )}
+
+        {/* API Status Indicator */}
+        {apiStatus && (
+          <div className="bg-blue-900/30 border border-blue-700 text-blue-300 px-4 py-3 rounded-md mb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${apiStatus.isRateLimited ? 'bg-red-500' : 'bg-green-500'}`}></div>
+                <span className="font-medium">API Status</span>
+              </div>
+              <div className="text-sm">
+                {apiStatus.requestsInLastMinute}/{apiStatus.rateLimitRemaining + apiStatus.requestsInLastMinute} requests/min
+                {apiStatus.isRateLimited && <span className="text-red-400 ml-2">(Rate Limited)</span>}
+              </div>
+            </div>
+            <div className="text-xs text-blue-400 mt-1">
+              Success: {apiStatus.successfulRequests} | Failed: {apiStatus.failedRequests} | Rate Limit Hits: {apiStatus.rateLimitHits}
+            </div>
+          </div>
         )}
 
         <main className="grid grid-cols-1 lg:grid-cols-2 gap-8">

@@ -13,8 +13,8 @@ interface UserLimitData {
 export const useUserLimit = (): UserLimitData => {
   const { user } = useUser();
   const [limitData, setLimitData] = useState<UserLimitData>({
-    limit: 10,
-    remaining: 10,
+    limit: 20,
+    remaining: 20,
     resetAt: null,
     isLoading: true,
     error: null,
@@ -74,8 +74,8 @@ export const useUserLimit = (): UserLimitData => {
       console.error('🔍 useUserLimit: Error fetching user limit:', error);
       // If API is not available, show default limit
       setLimitData({
-        limit: 10,
-        remaining: 10,
+        limit: 20,
+        remaining: 20,
         resetAt: null,
         isLoading: false,
         error: null,

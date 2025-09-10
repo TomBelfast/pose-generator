@@ -48,8 +48,8 @@ app.get('/api/user-limit/:clerkId', async (req, res) => {
       return res.json({
         success: true,
         user: null,
-        limit: 10,
-        remaining: 10,
+        limit: 20,
+        remaining: 20,
         resetAt: null
       });
     }
@@ -57,7 +57,7 @@ app.get('/api/user-limit/:clerkId', async (req, res) => {
     // Check if daily limit needs reset
     user = await checkAndResetDailyLimit(user);
     
-    const remaining = Math.max(0, 10 - user.dailyImageCount);
+    const remaining = Math.max(0, 20 - user.dailyImageCount);
     const resetAt = new Date(user.lastResetDate);
     resetAt.setDate(resetAt.getDate() + 1);
     resetAt.setHours(0, 0, 0, 0);
@@ -69,7 +69,7 @@ app.get('/api/user-limit/:clerkId', async (req, res) => {
         email: user.email,
         dailyImageCount: user.dailyImageCount
       },
-      limit: 10,
+      limit: 20,
       remaining,
       resetAt: resetAt.toISOString()
     });
@@ -145,13 +145,13 @@ app.post('/api/increment-count/:clerkId', async (req, res) => {
     user = await checkAndResetDailyLimit(user);
     
     // Check if user has reached daily limit
-    if (user.dailyImageCount + count > 10) {
+    if (user.dailyImageCount + count > 20) {
       return res.status(429).json({
         success: false,
         error: 'Daily limit exceeded',
-        limit: 10,
+        limit: 20,
         current: user.dailyImageCount,
-        remaining: Math.max(0, 10 - user.dailyImageCount)
+        remaining: Math.max(0, 20 - user.dailyImageCount)
       });
     }
     
@@ -163,10 +163,10 @@ app.post('/api/increment-count/:clerkId', async (req, res) => {
       }
     });
     
-    const remaining = Math.max(0, 10 - updatedUser.dailyImageCount);
+    const remaining = Math.max(0, 20 - updatedUser.dailyImageCount);
     
     console.log('🔍 API: Count incremented successfully:', { 
-      limit: 10, 
+      limit: 20, 
       current: updatedUser.dailyImageCount, 
       remaining 
     });
@@ -178,7 +178,7 @@ app.post('/api/increment-count/:clerkId', async (req, res) => {
         email: updatedUser.email,
         dailyImageCount: updatedUser.dailyImageCount
       },
-      limit: 10,
+      limit: 20,
       remaining
     });
   } catch (error) {
