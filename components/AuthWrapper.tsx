@@ -46,7 +46,7 @@ const clerkAppearance = {
     alert: 'bg-[#d1d5db] border-[#d1d5db] text-[#1e293b]',
     alertText: 'text-[#1e293b]',
     codeBlock: 'bg-[#d1d5db] text-[#1e293b]',
-    spinner: 'text-[#6366f1]',
+    spinner: 'text-[#00dd2f]',
   },
   variables: {
     colorPrimary: '#6366f1',
@@ -73,7 +73,7 @@ const UserLimitDisplay: React.FC<{ refreshLimit?: () => void }> = ({ refreshLimi
   if (isLoading) {
     return (
       <div className="flex items-center space-x-2 text-sm">
-        <Loader2 className="w-4 h-4 animate-spin text-neu-text-light" />
+        <Loader2 className="w-4 h-4 animate-spin text-neu-accent" />
         <span className="text-neu-text-light">Ładowanie...</span>
       </div>
     );
