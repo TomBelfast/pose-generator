@@ -3,7 +3,7 @@ import React from 'react';
 
 const Spinner: React.FC<{ className?: string }> = ({ className = 'w-6 h-6' }) => (
   <svg
-    className={`animate-spin ${className}`}
+    className={`animate-spin text-neu-accent ${className}`}
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
     viewBox="0 0 24 24"

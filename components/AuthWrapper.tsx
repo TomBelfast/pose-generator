@@ -6,7 +6,7 @@ import {
   SignUpButton,
   UserButton,
 } from '@clerk/clerk-react';
-import { Loader2, Image } from 'lucide-react';
+import { Loader2, Image, Zap } from 'lucide-react';
 import { useUserLimit } from '../hooks/useUserLimit';
 
 interface AuthWrapperProps {
@@ -16,87 +16,56 @@ interface AuthWrapperProps {
 
 const clerkAppearance = {
   elements: {
-    // Modal and container styling
-    modalContent: 'bg-base-200 border-base-300 shadow-2xl',
-    modalCloseButton: 'text-base-content hover:bg-base-300',
-    modalBackdrop: 'bg-base-100/80',
-    
-    // Card styling
-    card: 'bg-white border-gray-300',
-    
-    // Header styling
-    headerTitle: 'text-gray-800 font-bold',
-    headerSubtitle: 'text-gray-600',
-    
-    // Form styling
-    formFieldInput: 'bg-white border-gray-300 text-gray-800 placeholder-gray-500 focus:border-emerald-500 focus:ring-emerald-500',
-    formFieldLabel: 'text-gray-700',
-    formFieldErrorText: 'text-red-600',
-    formFieldSuccessText: 'text-green-600',
-    
-    // Button styling
-    formButtonPrimary: '!bg-emerald-500 hover:!bg-emerald-600 !text-white font-medium transition-colors',
-    formButtonPrimaryHover: '!bg-emerald-600',
-    formButtonSecondary: 'bg-base-300 hover:bg-base-400 text-base-content border-base-300',
-    
-    // Social buttons
-    socialButtonsBlockButton: 'bg-white hover:bg-gray-50 text-gray-700 border-gray-300 transition-colors',
-    socialButtonsBlockButtonText: 'text-gray-700',
-    
-    // Links and text
-    footerActionLink: 'text-emerald-600 hover:text-emerald-700 transition-colors',
-    identityPreviewText: 'text-gray-700',
-    identityPreviewEditButton: 'text-emerald-600 hover:text-emerald-700',
-    
-    // Divider
-    dividerLine: 'bg-gray-300',
-    dividerText: 'text-gray-500',
-    
-    // User button styling
-    userButtonPopoverCard: 'bg-base-200 border-base-300 shadow-xl',
-    userButtonPopoverActionButton: 'text-base-content hover:bg-base-300 transition-colors',
-    userButtonPopoverActionButtonText: 'text-base-content',
-    userButtonPopoverFooter: 'bg-base-200',
-    userButtonPopoverHeader: 'bg-base-200',
-    userButtonPopoverMain: 'bg-base-200',
-    
-    // Avatar styling
+    modalContent: 'bg-[#e0e5ec] border-[#d1d5db] shadow-2xl',
+    modalCloseButton: 'text-[#1e293b] hover:bg-[#d1d5db]',
+    modalBackdrop: 'bg-[#e0e5ec]/80',
+    card: 'bg-[#e0e5ec] border-[#d1d5db]',
+    headerTitle: 'text-[#1e293b] font-bold',
+    headerSubtitle: 'text-[#475569]',
+    formFieldInput: 'bg-[#e0e5ec] border-[#d1d5db] text-[#1e293b] placeholder-[#64748b] focus:border-[#6366f1] focus:ring-[#6366f1] shadow-[inset_2px_2px_4px_#a3b1c6,inset_-2px_-2px_4px_#ffffff]',
+    formFieldLabel: 'text-[#1e293b]',
+    formFieldErrorText: 'text-[#ef4444]',
+    formFieldSuccessText: 'text-[#10b981]',
+    formButtonPrimary: '!bg-[#10b981] hover:!bg-[#059669] !text-white font-medium transition-colors shadow-[4px_4px_8px_#a3b1c6,-4px_-4px_8px_#ffffff]',
+    formButtonPrimaryHover: '!bg-[#059669]',
+    formButtonSecondary: 'bg-[#e0e5ec] hover:bg-[#d1d5db] text-[#1e293b] border-[#d1d5db]',
+    socialButtonsBlockButton: 'bg-[#e0e5ec] hover:bg-[#d1d5db] text-[#1e293b] border-[#d1d5db] transition-colors shadow-[4px_4px_8px_#a3b1c6,-4px_-4px_8px_#ffffff]',
+    socialButtonsBlockButtonText: 'text-[#1e293b]',
+    footerActionLink: 'text-[#6366f1] hover:text-[#4f46e5] transition-colors',
+    identityPreviewText: 'text-[#1e293b]',
+    identityPreviewEditButton: 'text-[#6366f1] hover:text-[#4f46e5]',
+    dividerLine: 'bg-[#d1d5db]',
+    dividerText: 'text-[#64748b]',
+    userButtonPopoverCard: 'bg-[#e0e5ec] border-[#d1d5db] shadow-xl',
+    userButtonPopoverActionButton: 'text-[#1e293b] hover:bg-[#d1d5db] transition-colors',
+    userButtonPopoverActionButtonText: 'text-[#1e293b]',
+    userButtonPopoverFooter: 'bg-[#e0e5ec]',
+    userButtonPopoverHeader: 'bg-[#e0e5ec]',
+    userButtonPopoverMain: 'bg-[#e0e5ec]',
     avatarBox: 'w-8 h-8',
-    
-    // Alert styling
-    alert: 'bg-base-300 border-base-300 text-base-content',
-    alertText: 'text-base-content',
-    
-    // Code styling
-    codeBlock: 'bg-base-300 text-base-content',
-    
-    // Loading states
-    spinner: 'text-emerald-500',
+    alert: 'bg-[#d1d5db] border-[#d1d5db] text-[#1e293b]',
+    alertText: 'text-[#1e293b]',
+    codeBlock: 'bg-[#d1d5db] text-[#1e293b]',
+    spinner: 'text-[#6366f1]',
   },
   variables: {
-    colorPrimary: '#10b981',
-    colorBackground: '#1f2937',
-    colorInputBackground: '#374151',
-    colorInputText: '#f9fafb',
-    colorText: '#f9fafb',
-    colorTextSecondary: '#9ca3af',
-    borderRadius: '0.5rem',
+    colorPrimary: '#6366f1',
+    colorBackground: '#e0e5ec',
+    colorInputBackground: '#e0e5ec',
+    colorInputText: '#1e293b',
+    colorText: '#1e293b',
+    colorTextSecondary: '#475569',
+    borderRadius: '12px',
   }
 };
 
 const UserLimitDisplay: React.FC<{ refreshLimit?: () => void }> = ({ refreshLimit }) => {
   const { remaining, limit, isLoading, error, refresh } = useUserLimit();
-  
-  // Use the passed refreshLimit function if available, otherwise use the one from hook
-  const refreshFunction = refreshLimit || refresh;
-  
-  console.log('🔍 UserLimitDisplay: Current state:', { remaining, limit, isLoading, error });
-  console.log('🔍 UserLimitDisplay: refreshLimit function:', !!refreshLimit, 'refresh function:', !!refresh);
 
-  // Force refresh when refreshLimit function changes
+  const refreshFunction = refreshLimit || refresh;
+
   useEffect(() => {
     if (refreshLimit) {
-      console.log('🔍 UserLimitDisplay: refreshLimit function changed, calling it');
       refreshLimit();
     }
   }, [refreshLimit]);
@@ -104,16 +73,16 @@ const UserLimitDisplay: React.FC<{ refreshLimit?: () => void }> = ({ refreshLimi
   if (isLoading) {
     return (
       <div className="flex items-center space-x-2 text-sm">
-        <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
-        <span className="text-gray-400">Loading...</span>
+        <Loader2 className="w-4 h-4 animate-spin text-neu-text-light" />
+        <span className="text-neu-text-light">Ładowanie...</span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center space-x-2 text-sm text-red-400">
-        <span>Limit unavailable</span>
+      <div className="flex items-center space-x-2 text-sm text-neu-danger">
+        <span>Limit niedostępny</span>
       </div>
     );
   }
@@ -122,26 +91,26 @@ const UserLimitDisplay: React.FC<{ refreshLimit?: () => void }> = ({ refreshLimi
   const isLow = remaining <= 2;
 
   return (
-    <div className="flex items-center space-x-3">
-      <div className="flex items-center space-x-2">
-        <Image className="w-4 h-4 text-gray-400" />
-        <span className="text-sm text-gray-400">
-          {remaining}/{limit} free
+    <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex items-center gap-1.5 sm:gap-2">
+        <Image className="w-4 h-4 text-neu-text-muted" />
+        <span className="text-xs sm:text-sm text-neu-text-muted">
+          {remaining}/{limit}
         </span>
       </div>
-      
-      <div className="w-20 h-2 bg-base-300 rounded-full overflow-hidden">
-        <div 
-          className={`h-full transition-all duration-300 ${
-            isLow ? 'bg-red-500' : 'bg-emerald-500'
+
+      <div className="w-12 sm:w-20 neu-progress h-1.5 sm:h-2">
+        <div
+          className={`h-full rounded-full transition-all duration-300 ${
+            isLow ? 'bg-neu-danger' : 'bg-neu-success'
           }`}
           style={{ width: `${percentage}%` }}
         />
       </div>
-      
+
       {isLow && (
-        <span className="text-xs text-red-400 font-medium">
-          Low!
+        <span className="text-xs text-neu-danger font-medium hidden sm:inline">
+          Mało!
         </span>
       )}
     </div>
@@ -150,23 +119,26 @@ const UserLimitDisplay: React.FC<{ refreshLimit?: () => void }> = ({ refreshLimi
 
 const AuthWrapper: React.FC<AuthWrapperProps> = ({ children, refreshLimit }) => {
   return (
-    <div className="min-h-screen bg-base-100">
-      {/* Header with authentication controls */}
-      <header className="bg-base-200 border-b border-base-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <h1 className="text-xl font-bold text-base-content">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--neu-base)', color: 'var(--neu-text)' }}>
+      {/* Header */}
+      <header className="neu-raised border-b border-white/20 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-14 sm:h-16">
+            {/* Logo */}
+            <div className="flex items-center gap-2">
+              <div className="neu-raised-sm p-1.5 sm:p-2 rounded-full">
+                <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-neu-accent" />
+              </div>
+              <h1 className="text-base sm:text-xl font-bold text-neu-text">
                 Pose Generator
               </h1>
             </div>
-            
-            <div className="flex items-center space-x-4">
+
+            {/* User controls */}
+            <div className="flex items-center gap-2 sm:gap-4">
               <SignedIn>
                 <UserLimitDisplay refreshLimit={refreshLimit} />
-                <UserButton 
-                  appearance={clerkAppearance}
-                />
+                <UserButton appearance={clerkAppearance} />
               </SignedIn>
             </div>
           </div>
@@ -181,38 +153,42 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children, refreshLimit }) => 
         <SignedOut>
           <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] p-4">
             <div className="w-full max-w-md">
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-base-content mb-2">
+              {/* Welcome card */}
+              <div className="neu-card text-center">
+                {/* Icon */}
+                <div className="neu-raised-sm inline-flex p-4 rounded-full mb-6">
+                  <Zap className="w-10 h-10 sm:w-12 sm:h-12 text-neu-accent" />
+                </div>
+
+                <h2 className="text-2xl sm:text-3xl font-bold text-neu-text mb-2">
                   Pose Generator
                 </h2>
-                <p className="text-gray-400">
-                  Sign in to start generating amazing poses with AI
+                <p className="text-neu-text-muted mb-8">
+                  Zaloguj się, aby zacząć generować pozy z AI
                 </p>
-              </div>
-              
-              <div className="bg-base-200 rounded-lg p-3 border border-base-300">
-                <div className="w-full">
-                  <SignInButton 
-                    mode="modal"
-                    appearance={{
-                      ...clerkAppearance,
-                      elements: {
-                        ...clerkAppearance.elements,
-                        formButtonPrimary: '!bg-emerald-500 hover:!bg-emerald-600 !text-white font-medium transition-colors',
-                        formButtonPrimaryHover: '!bg-emerald-600',
-                      }
-                    }}
-                  />
-                </div>
-              </div>
-              
-              <div className="text-center mt-6">
-                <p className="text-gray-400 text-sm">
-                  Don't have an account?{' '}
-                  <SignUpButton 
+
+                {/* Sign in button */}
+                <div className="neu-raised-sm p-4 rounded-[var(--radius-sm)]">
+                  <SignInButton
                     mode="modal"
                     appearance={clerkAppearance}
                   />
+                </div>
+
+                {/* Sign up link */}
+                <p className="text-neu-text-muted text-sm mt-6">
+                  Nie masz konta?{' '}
+                  <SignUpButton
+                    mode="modal"
+                    appearance={clerkAppearance}
+                  />
+                </p>
+              </div>
+
+              {/* Features hint */}
+              <div className="mt-6 text-center">
+                <p className="text-xs text-neu-text-light">
+                  20 darmowych generacji dziennie
                 </p>
               </div>
             </div>

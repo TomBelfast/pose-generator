@@ -14,13 +14,13 @@ interface ResultsPanelProps {
 }
 
 const downloadImage = (src: string, prompt: string) => {
-    const link = document.createElement('a');
-    link.href = src;
-    link.download = `${prompt.replace(/\s+/g, '_')}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
+  const link = document.createElement('a');
+  link.href = src;
+  link.download = `${prompt.replace(/\s+/g, '_')}.png`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
 
 const ResultsPanel: React.FC<ResultsPanelProps> = ({
   generatedImages,
@@ -34,126 +34,153 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
   const selectedImage = selectedImageIndex !== null ? generatedImages[selectedImageIndex] : null;
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Preview area - shows selected image, loading state, or placeholder */}
-      <div className="relative aspect-square w-full bg-base-200 border-2 border-base-300 rounded-lg flex items-center justify-center">
+    <div className="flex flex-col gap-4 sm:gap-5">
+      {/* Preview area */}
+      <div className="neu-pressed relative aspect-square w-full flex items-center justify-center rounded-[var(--radius-lg)]">
         {isGenerating ? (
-          <div className="text-center text-gray-600">
-            <Spinner className="w-12 h-12 mx-auto mb-4 text-emerald-500" />
-            <p className="text-lg font-medium">
-              Generating {generationProgress.current}/{generationProgress.total} images...
+          <div className="text-center p-4 sm:p-6">
+            <Spinner className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-4 text-neu-accent" />
+            <p className="text-base sm:text-lg font-medium text-neu-text">
+              Generowanie {generationProgress.current}/{generationProgress.total}...
             </p>
-            <p className="text-sm mt-2">Please wait while AI creates your poses</p>
-            <div className="mt-4 w-full bg-base-300 rounded-full h-2">
-              <div 
-                className="bg-emerald-500 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${(generationProgress.current / generationProgress.total) * 100}%` }}
+            <p className="text-sm text-neu-text-muted mt-2">
+              AI tworzy Twoje pozy
+            </p>
+            {/* Progress bar */}
+            <div className="mt-4 w-full max-w-xs mx-auto neu-progress h-2">
+              <div
+                className="neu-progress-bar h-2"
+                style={{
+                  width: `${(generationProgress.current / generationProgress.total) * 100}%`
+                }}
               />
             </div>
           </div>
         ) : selectedImage && selectedImage.status === 'completed' && selectedImage.src ? (
           <>
-            <img 
-              src={selectedImage.src} 
-              alt={selectedImage.prompt} 
-              className="object-contain w-full h-full rounded-lg cursor-pointer" 
+            <img
+              src={selectedImage.src}
+              alt={selectedImage.prompt}
+              className="object-contain w-full h-full rounded-[var(--radius-lg)] cursor-pointer"
               onClick={() => onThumbnailClick(selectedImageIndex!)}
             />
-            <div className="absolute top-2 right-2 flex gap-2">
-                <button
-                    onClick={() => downloadImage(selectedImage.src!, selectedImage.prompt)}
-                    className="relative p-2 bg-black/50 hover:bg-black/75 rounded-full text-white transition group/btn"
-                    aria-label="Download image"
-                    title="Download current image"
-                >
-                    <Download size={20} />
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black/80 text-white text-xs rounded opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap">
-                        Download image
-                    </div>
-                </button>
-            </div>
-            <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/50 rounded text-white text-xs">
-              Click to view fullscreen
+            {/* Download button overlay */}
+            <button
+              onClick={() => downloadImage(selectedImage.src!, selectedImage.prompt)}
+              className="neu-icon-btn absolute top-3 right-3 p-2 sm:p-3 min-w-[44px] min-h-[44px] text-neu-text-muted hover:text-neu-accent"
+              aria-label="Pobierz obraz"
+              type="button"
+            >
+              <Download size={20} />
+            </button>
+            {/* Click hint */}
+            <div className="absolute bottom-3 left-3 neu-raised-sm px-3 py-1.5 text-xs text-neu-text-muted">
+              Kliknij, aby powiększyć
             </div>
           </>
         ) : selectedImage && selectedImage.status === 'loading' ? (
-          <div className="text-center text-gray-600">
-            <Spinner className="w-12 h-12 mx-auto mb-4 text-emerald-500" />
-            <p className="text-lg font-medium">Generating...</p>
-            <p className="text-sm mt-2">{selectedImage.prompt}</p>
+          <div className="text-center p-4 sm:p-6">
+            <Spinner className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-4 text-neu-accent" />
+            <p className="text-base font-medium text-neu-text">Generowanie...</p>
+            <p className="text-sm text-neu-text-muted mt-2">{selectedImage.prompt}</p>
           </div>
         ) : selectedImage && selectedImage.status === 'failed' ? (
-          <div className="text-center text-red-500">
-            <ImageOff size={48} className="mx-auto mb-4" />
-            <p className="text-lg font-medium">Generation Failed</p>
-            <p className="text-sm mt-2">{selectedImage.prompt}</p>
+          <div className="text-center p-4 sm:p-6">
+            <div className="neu-pressed-sm inline-flex p-4 rounded-full mb-4">
+              <ImageOff size={32} className="text-neu-danger" />
+            </div>
+            <p className="text-base font-medium text-neu-danger">Generowanie nie powiodło się</p>
+            <p className="text-sm text-neu-text-muted mt-2">{selectedImage.prompt}</p>
           </div>
         ) : (
-          <div className="text-gray-500 text-center">
-            <ImageOff size={48} />
-            <p className="mt-2 text-sm">Select an image to preview</p>
+          <div className="text-center p-4 sm:p-6">
+            <div className="neu-raised-sm inline-flex p-4 rounded-full mb-4">
+              <ImageOff size={32} className="text-neu-text-light" />
+            </div>
+            <p className="text-sm text-neu-text-muted">Wybierz obraz do podglądu</p>
           </div>
         )}
       </div>
 
+      {/* Thumbnails grid */}
       {generatedImages.length > 0 && (
         <div>
-            <div className="flex justify-between items-center mb-2">
-                <h3 className="text-sm font-medium">Generated Images</h3>
-                {generatedImages.some(img => img.status === 'completed' && img.src) && (
-                    <button
-                        onClick={onDownloadAll}
-                        className="relative flex items-center gap-1 px-3 py-1.5 bg-brand-primary hover:bg-brand-primary/90 text-white text-xs rounded-md transition-colors group/btn"
-                        aria-label="Download all images"
-                        title="Download all generated images"
-                    >
-                        <DownloadCloud size={14} />
-                        Download All
-                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black/80 text-white text-xs rounded opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap">
-                            Download all images
-                        </div>
-                    </button>
-                )}
-            </div>
-            <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-4 xl:grid-cols-5 gap-2">
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="text-sm font-medium text-neu-text">
+              Wygenerowane obrazy
+            </h3>
+            {generatedImages.some(img => img.status === 'completed' && img.src) && (
+              <button
+                onClick={onDownloadAll}
+                className="neu-btn neu-btn-primary flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-white min-h-[36px]"
+                aria-label="Pobierz wszystkie obrazy"
+                type="button"
+              >
+                <DownloadCloud size={14} />
+                <span className="hidden sm:inline">Pobierz wszystkie</span>
+                <span className="sm:hidden">Pobierz</span>
+              </button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3">
             {generatedImages.map((img, index) => (
-                <div
+              <button
                 key={img.id}
                 onClick={() => img.status === 'completed' && onThumbnailClick(index)}
-                className={`relative group aspect-square rounded-md border-2 transition-all duration-200
-                    ${selectedImageIndex === index ? 'border-brand-primary' : 'border-transparent'}
-                    ${img.status === 'completed' ? 'cursor-pointer' : 'cursor-default'}`}
-                >
+                type="button"
+                disabled={img.status !== 'completed'}
+                className={`
+                  relative group aspect-square
+                  rounded-[var(--radius-sm)]
+                  transition-all duration-150
+                  overflow-hidden
+                  ${selectedImageIndex === index
+                    ? 'neu-selected ring-2 ring-neu-accent'
+                    : img.status === 'completed'
+                      ? 'neu-selectable'
+                      : 'neu-pressed cursor-default'
+                  }
+                `}
+                aria-label={`Miniatura: ${img.prompt}`}
+                aria-pressed={selectedImageIndex === index}
+              >
                 {img.status === 'loading' && (
-                    <div className="w-full h-full bg-base-300 flex items-center justify-center rounded-md animate-pulse">
-                        <Spinner className="w-6 h-6 text-emerald-500" />
-                    </div>
+                  <div className="w-full h-full flex items-center justify-center animate-pulse">
+                    <Spinner className="w-5 h-5 sm:w-6 sm:h-6 text-neu-accent" />
+                  </div>
                 )}
                 {img.status === 'failed' && (
-                    <div className="w-full h-full bg-red-900/50 flex items-center justify-center rounded-md">
-                        <ImageOff size={24} className="text-red-400" />
-                    </div>
+                  <div className="w-full h-full flex items-center justify-center bg-red-100">
+                    <ImageOff size={20} className="text-neu-danger" />
+                  </div>
                 )}
                 {img.status === 'completed' && img.src && (
-                    <>
-                    <img src={img.src} alt={img.prompt} className="object-cover w-full h-full rounded-md" />
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-md">
-                        <button 
-                            onClick={(e) => { e.stopPropagation(); downloadImage(img.src!, img.prompt); }}
-                            className="relative p-1.5 bg-white/20 hover:bg-white/40 rounded-full text-white group/btn"
-                            title="Download this image"
-                        >
-                            <Download size={16} />
-                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black/80 text-white text-xs rounded opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap">
-                                Download
-                            </div>
-                        </button>
+                  <>
+                    <img
+                      src={img.src}
+                      alt={img.prompt}
+                      className="object-cover w-full h-full"
+                    />
+                    {/* Hover overlay with download */}
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex items-center justify-center">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          downloadImage(img.src!, img.prompt);
+                        }}
+                        className="neu-icon-btn p-2 text-white hover:text-neu-accent min-w-[36px] min-h-[36px]"
+                        type="button"
+                        aria-label="Pobierz ten obraz"
+                      >
+                        <Download size={16} />
+                      </button>
                     </div>
-                    </>
+                  </>
                 )}
-                </div>
+              </button>
             ))}
-            </div>
+          </div>
         </div>
       )}
     </div>

@@ -25,58 +25,108 @@ const PoseSelector: React.FC<PoseSelectorProps> = ({
   poseCount
 }) => {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5 sm:gap-6">
+      {/* Custom pose input */}
       <div>
-        <label htmlFor="custom-pose" className="block text-sm font-medium mb-2">Custom Pose (optional)</label>
+        <label
+          htmlFor="custom-pose"
+          className="block text-sm font-medium text-neu-text mb-2"
+        >
+          Własna poza (opcjonalnie)
+        </label>
         <input
           type="text"
           id="custom-pose"
           value={customPose}
           onChange={(e) => onCustomPoseChange(e.target.value)}
-          placeholder="e.g. 'sitting on a chair'"
-          className="w-full bg-base-200 border border-base-300 rounded-md p-2 focus:ring-2 focus:ring-brand-primary focus:border-brand-primary outline-none transition"
+          placeholder="np. 'siedząca na krześle'"
+          className="neu-input"
         />
       </div>
+
+      {/* Predefined poses */}
       <div>
-        <h3 className="text-sm font-medium mb-2">Choose Predefined Poses</h3>
-        <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+        <h3 className="text-sm font-medium text-neu-text mb-3">
+          Wybierz predefiniowane pozy
+        </h3>
+        <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
           {PREDEFINED_POSES.map((pose: Pose) => {
             const isSelected = selectedPoses.has(pose.name);
             return (
               <button
                 key={pose.name}
                 onClick={() => onPoseSelect(pose.name)}
-                className={`flex flex-col items-center justify-center p-2 gap-1 rounded-lg border-2 transition-all duration-200
-                  ${isSelected ? 'bg-brand-light border-brand-primary text-brand-primary' : 'bg-base-200 border-base-300 hover:border-brand-secondary'}`}
+                type="button"
+                className={`
+                  flex flex-col items-center justify-center
+                  p-2 sm:p-3 gap-1
+                  min-h-[72px] sm:min-h-[80px]
+                  rounded-[var(--radius-sm)]
+                  transition-all duration-150
+                  ${isSelected
+                    ? 'neu-selected'
+                    : 'neu-selectable'
+                  }
+                `}
+                aria-pressed={isSelected}
+                aria-label={`Wybierz pozę: ${pose.label}`}
               >
-                <pose.icon className={`w-8 h-8 ${isSelected ? 'text-brand-primary' : 'text-gray-400'}`} />
-                <span className="text-xs text-center">{pose.label}</span>
+                <pose.icon
+                  className={`w-6 h-6 sm:w-8 sm:h-8 ${
+                    isSelected ? 'text-neu-accent' : 'text-neu-text-muted'
+                  }`}
+                />
+                <span className={`text-xs text-center leading-tight ${
+                  isSelected ? 'text-neu-accent font-medium' : 'text-neu-text-muted'
+                }`}>
+                  {pose.label}
+                </span>
               </button>
             );
           })}
         </div>
       </div>
+
+      {/* Generate button */}
       <button
         onClick={onGenerate}
         disabled={isGenerateDisabled || isGenerating}
-        className="relative w-full flex items-center justify-center gap-2 bg-brand-primary hover:bg-brand-secondary text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 disabled:bg-base-300 disabled:cursor-not-allowed disabled:text-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-base-100 focus:ring-brand-primary group/btn"
-        title={isGenerateDisabled ? "Upload an image and select poses to generate" : `Generate ${poseCount} image${poseCount !== 1 ? 's' : ''}`}
+        type="button"
+        className={`
+          relative w-full
+          flex items-center justify-center gap-2
+          py-3 sm:py-4 px-4
+          rounded-[var(--radius-sm)]
+          font-semibold text-base
+          min-h-[48px] sm:min-h-[52px]
+          transition-all duration-150
+          ${isGenerateDisabled || isGenerating
+            ? 'neu-btn opacity-50 cursor-not-allowed text-neu-text-light'
+            : 'neu-btn neu-btn-primary'
+          }
+        `}
+        aria-busy={isGenerating}
+        aria-disabled={isGenerateDisabled}
       >
         {isGenerating ? (
-            <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span>Generating...</span>
-            </>
+          <>
+            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            <span>Generowanie...</span>
+          </>
         ) : (
-            <>
-                <Bot size={20} />
-                <span>Generate Selected Poses ({poseCount})</span>
-            </>
+          <>
+            <Bot size={20} />
+            <span>Generuj wybrane pozy ({poseCount})</span>
+          </>
         )}
-        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-black/80 text-white text-sm rounded opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap">
-          {isGenerateDisabled ? "Upload an image and select poses to generate" : `Generate ${poseCount} image${poseCount !== 1 ? 's' : ''}`}
-        </div>
       </button>
+
+      {/* Helper text */}
+      {isGenerateDisabled && !isGenerating && (
+        <p className="text-xs text-neu-text-light text-center -mt-2">
+          Prześlij obraz i wybierz co najmniej jedną pozę, aby rozpocząć generowanie
+        </p>
+      )}
     </div>
   );
 };

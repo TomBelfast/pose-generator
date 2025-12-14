@@ -1,62 +1,249 @@
-/* Reset and base styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* NEUMORPHISM - DARK MODE + DARK TEXT IN LIGHT */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  /* DARK MODE - DARK GRAY */
+  --neu-base: #1a1a1a;
+  --neu-dark: #0f0f0f;
+  --neu-light: #2a2a2a;
+  --neu-surface: #242424;
+  --neu-accent: #00dd2f;
+  --neu-accent-hover: #00bb26;
+  --neu-accent-light: #1a4d1f;
+  --neu-success: #34d399;
+  --neu-danger: #f87171;
+  --neu-text: #f0f2f5;
+  --neu-text-muted: #c9cdd4;
+  --neu-text-light: #9ca3af;
+  --shadow-convex: 6px 6px 12px #0f0f0f, -6px -6px 12px #2a2a2a;
+  --shadow-convex-sm: 3px 3px 6px #0f0f0f, -3px -3px 6px #2a2a2a;
+  --shadow-inset: inset 4px 4px 8px #0f0f0f, inset -4px -4px 8px #2a2a2a;
+  --shadow-inset-sm: inset 2px 2px 4px #0f0f0f, inset -2px -2px 4px #2a2a2a;
+  --shadow-hover: 8px 8px 16px #0f0f0f, -8px -8px 16px #2a2a2a;
+  --shadow-focus: 0 0 0 3px rgba(0, 221, 47, 0.4);
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --transition-fast: 150ms ease;
+}
+
+/* LIGHT MODE */
+.light {
+  --neu-base: #e0e5ec;
+  --neu-dark: #a3b1c6;
+  --neu-light: #ffffff;
+  --neu-surface: #e0e5ec;
+  --neu-accent: #00dd2f;
+  --neu-accent-hover: #00bb26;
+  --neu-accent-light: #b3ffc4;
+  --neu-success: #10b981;
+  --neu-danger: #ef4444;
+  --neu-text: #1a1a1a;
+  --neu-text-muted: #374151;
+  --neu-text-light: #4b5563;
+  --shadow-convex: 8px 8px 16px #a3b1c6, -8px -8px 16px #ffffff;
+  --shadow-convex-sm: 4px 4px 8px #a3b1c6, -4px -4px 8px #ffffff;
+  --shadow-inset: inset 4px 4px 8px #a3b1c6, inset -4px -4px 8px #ffffff;
+  --shadow-inset-sm: inset 2px 2px 4px #a3b1c6, inset -2px -2px 4px #ffffff;
+  --shadow-hover: 10px 10px 20px #a3b1c6, -10px -10px 20px #ffffff;
+  --shadow-focus: 0 0 0 3px rgba(0, 221, 47, 0.4);
+}
+
+@media (max-width: 640px) {
+  :root, .light {
+    --shadow-convex: 4px 4px 8px var(--neu-dark), -4px -4px 8px var(--neu-light);
+    --shadow-convex-sm: 2px 2px 4px var(--neu-dark), -2px -2px 4px var(--neu-light);
+    --shadow-inset: inset 2px 2px 4px var(--neu-dark), inset -2px -2px 4px var(--neu-light);
+    --shadow-hover: 5px 5px 10px var(--neu-dark), -5px -5px 10px var(--neu-light);
+  }
 }
 
 html, body {
   height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--neu-base);
+  color: var(--neu-text);
 }
 
-#root {
-  height: 100%;
-  min-height: 100vh;
+#root { height: 100%; min-height: 100vh; }
+
+/* COMPONENTS */
+.neu-raised {
+  background: var(--neu-surface);
+  box-shadow: var(--shadow-convex);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.neu-raised-sm {
+  background: var(--neu-surface);
+  box-shadow: var(--shadow-convex-sm);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.neu-pressed {
+  background: var(--neu-surface);
+  box-shadow: var(--shadow-inset);
+  border-radius: var(--radius-md);
+}
+.neu-pressed-sm {
+  background: var(--neu-surface);
+  box-shadow: var(--shadow-inset-sm);
+  border-radius: var(--radius-sm);
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
+/* BUTTONS */
+.neu-btn {
+  background: var(--neu-surface);
+  box-shadow: var(--shadow-convex-sm);
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast), border-color var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+.neu-btn:hover:not(:disabled) {
+  box-shadow: var(--shadow-hover);
+  border-color: rgba(127, 255, 0, 0.3);
+}
+.neu-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus), var(--shadow-convex-sm);
+  border-color: var(--neu-accent);
+}
+.neu-btn:active:not(:disabled) {
+  box-shadow: var(--shadow-inset-sm);
+  transform: scale(0.98);
+}
+.neu-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.neu-btn-primary {
+  background: var(--neu-accent);
+  color: white;
+  box-shadow: 12px 12px 30px rgba(0, 0, 0, 0.7), -6px -6px 18px rgba(255, 255, 255, 0.15), 
+              inset 3px 3px 6px rgba(255, 255, 255, 0.3), inset -3px -3px 6px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transform: translateY(0);
+  transition: all 150ms ease;
+  position: relative;
+}
+.neu-btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 50%);
+  pointer-events: none;
+  opacity: 0.5;
+}
+.neu-btn-primary:hover:not(:disabled) { 
+  background: var(--neu-accent-hover); 
+  box-shadow: 16px 16px 40px rgba(0, 0, 0, 0.8), -8px -8px 24px rgba(255, 255, 255, 0.2),
+              inset 3px 3px 6px rgba(255, 255, 255, 0.35), inset -3px -3px 6px rgba(0, 0, 0, 0.35);
+  transform: translateY(-4px) scale(1.02);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+.neu-btn-primary:hover:not(:disabled)::before {
+  opacity: 0.7;
+}
+.neu-btn-primary:active:not(:disabled) {
+  box-shadow: inset 8px 8px 16px rgba(0, 0, 0, 0.6), inset -4px -4px 12px rgba(255, 255, 255, 0.15);
+  transform: translateY(2px) scale(0.97);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+.neu-btn-primary:active:not(:disabled)::before {
+  opacity: 0.3;
 }
 
-::-webkit-scrollbar-track {
-  background: #1f2937;
+/* INPUTS */
+.neu-input {
+  background: var(--neu-surface);
+  box-shadow: var(--shadow-inset-sm);
+  border-radius: var(--radius-sm);
+  border: 2px solid transparent;
+  padding: 12px 16px;
+  color: var(--neu-text);
+  transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
+  width: 100%;
 }
+.neu-input::placeholder { color: var(--neu-text-light); }
+.neu-input:hover:not(:disabled) { border-color: rgba(0, 221, 47, 0.2); }
+.neu-input:focus { outline: none; border-color: var(--neu-accent); box-shadow: var(--shadow-focus), var(--shadow-inset-sm); }
 
-::-webkit-scrollbar-thumb {
-  background: #4f46e5;
-  border-radius: 4px;
+/* CARDS */
+.neu-card {
+  background: var(--neu-surface);
+  box-shadow: var(--shadow-convex);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 24px;
 }
+@media (max-width: 640px) { .neu-card { padding: 16px; border-radius: var(--radius-md); } }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #4338ca;
+/* ICON BUTTONS */
+.neu-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--neu-surface);
+  box-shadow: var(--shadow-convex-sm);
+  border-radius: 50%;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
 }
+.neu-icon-btn:hover:not(:disabled) { box-shadow: var(--shadow-hover); border-color: rgba(0,221,47,0.2); }
+.neu-icon-btn:focus-visible { outline: none; box-shadow: var(--shadow-focus), var(--shadow-convex-sm); }
+.neu-icon-btn:active:not(:disabled) { box-shadow: var(--shadow-inset-sm); transform: scale(0.95); }
 
-/* Custom styles for Clerk SignInButton */
+/* SELECTABLE */
+.neu-selectable {
+  background: var(--neu-surface);
+  box-shadow: var(--shadow-convex-sm);
+  border-radius: var(--radius-sm);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast), border-color var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+.neu-selectable:hover:not(.neu-selected) { box-shadow: var(--shadow-hover); border-color: rgba(0,221,47,0.3); }
+.neu-selectable:focus-visible { outline: none; box-shadow: var(--shadow-focus), var(--shadow-convex-sm); }
+.neu-selectable:active:not(.neu-selected) { box-shadow: var(--shadow-inset-sm); transform: scale(0.98); }
+.neu-selected { background: var(--neu-accent-light); box-shadow: var(--shadow-inset-sm); border-color: var(--neu-accent); }
+
+/* PROGRESS */
+.neu-progress { background: var(--neu-surface); box-shadow: var(--shadow-inset-sm); border-radius: 9999px; overflow: hidden; }
+.neu-progress-bar { background: linear-gradient(90deg, var(--neu-success), #34d399); border-radius: 9999px; transition: width 250ms; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--neu-surface); box-shadow: var(--shadow-inset-sm); border-radius: 4px; }
+::-webkit-scrollbar-thumb { background: var(--neu-dark); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--neu-accent); }
+
+/* HIGH CONTRAST */
+@media (prefers-contrast: high) {
+  :root { --neu-text: #ffffff; }
+  .light { --neu-text: #000000; }
+  .neu-btn, .neu-selectable, .neu-input { border: 2px solid var(--neu-text) !important; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+
+/* CLERK */
 button[component="SignInButton"] {
-  background-color: #10b981 !important;
+  background: var(--neu-success) !important;
+  box-shadow: var(--shadow-convex-sm) !important;
   color: white !important;
   border: none !important;
   width: 100% !important;
-  padding: 12px 0 !important;
-  border-radius: 8px !important;
-  font-weight: 500 !important;
-  font-size: 18px !important;
-  transition: background-color 0.2s ease !important;
+  padding: 14px 0 !important;
+  border-radius: var(--radius-sm) !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
 }
-
-button[component="SignInButton"]:hover {
-  background-color: #059669 !important;
-}
-
-button[component="SignInButton"]:focus {
-  outline: none !important;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3) !important;
-}
-
-
+button[component="SignInButton"]:hover { background: #059669 !important; box-shadow: var(--shadow-hover) !important; }
+button[component="SignInButton"]:active { box-shadow: var(--shadow-inset-sm) !important; }
