@@ -164,17 +164,25 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
                     />
                     {/* Hover overlay with download */}
                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex items-center justify-center">
-                      <button
+                      <div
                         onClick={(e) => {
                           e.stopPropagation();
                           downloadImage(img.src!, img.prompt);
                         }}
-                        className="neu-icon-btn p-2 text-white hover:text-neu-accent min-w-[36px] min-h-[36px]"
-                        type="button"
+                        className="neu-icon-btn p-2 text-white hover:text-neu-accent min-w-[36px] min-h-[36px] cursor-pointer"
+                        role="button"
+                        tabIndex={0}
                         aria-label="Pobierz ten obraz"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            downloadImage(img.src!, img.prompt);
+                          }
+                        }}
                       >
                         <Download size={16} />
-                      </button>
+                      </div>
                     </div>
                   </>
                 )}
