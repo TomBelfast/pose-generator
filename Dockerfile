@@ -14,9 +14,12 @@ RUN npm ci
 COPY . .
 
 # Set environment variables for Prisma and Vite build
+# Set environment variables for Prisma and Vite build
 ENV DATABASE_URL="file:/app/data/production.db"
-ENV VITE_GEMINI_API_KEY="eJiOmRRZiVAQSOhSZzLDyALzc"
-ENV VITE_CLERK_PUBLISHABLE_KEY="pk_test_ZW5hYmxlZC1kb3ZlLTk1LmNsZXJrLmFjY291bnRzLmRldiQ"
+ARG VITE_GEMINI_API_KEY
+ARG VITE_CLERK_PUBLISHABLE_KEY
+ENV VITE_GEMINI_API_KEY=$VITE_GEMINI_API_KEY
+ENV VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY
 
 # Generate Prisma client and create database
 RUN npx prisma generate

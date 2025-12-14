@@ -10,16 +10,35 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 4999;
+const isDev = process.env.NODE_ENV !== 'production';
+
+// Helper for safe error handling
+const handleError = (res, error, message = 'Internal server error') => {
+  console.error(message, error);
+  res.status(500).json({
+    success: false,
+    error: isDev ? error.message : message
+  });
+};
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
+// Validation helpers
+const isValidEmail = (email) => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
+
+const isValidClerkId = (id) => {
+  return typeof id === 'string' && id.length > 0 && /^[a-zA-Z0-9_-]+$/.test(id);
+};
+
 // Helper function to check if user needs daily reset
 async function checkAndResetDailyLimit(user) {
   const today = new Date();
   const lastReset = new Date(user.lastResetDate);
-  
+
   // Check if it's a new day (different date)
   if (today.toDateString() !== lastReset.toDateString()) {
     await prisma.user.update({
@@ -31,7 +50,7 @@ async function checkAndResetDailyLimit(user) {
     });
     return { ...user, dailyImageCount: 0, lastResetDate: today };
   }
-  
+
   return user;
 }
 
@@ -39,11 +58,11 @@ async function checkAndResetDailyLimit(user) {
 app.get('/api/user-limit/:clerkId', async (req, res) => {
   try {
     const { clerkId } = req.params;
-    
+
     let user = await prisma.user.findUnique({
       where: { clerkId }
     });
-    
+
     if (!user) {
       return res.json({
         success: true,
@@ -53,15 +72,15 @@ app.get('/api/user-limit/:clerkId', async (req, res) => {
         resetAt: null
       });
     }
-    
+
     // Check if daily limit needs reset
     user = await checkAndResetDailyLimit(user);
-    
+
     const remaining = Math.max(0, 20 - user.dailyImageCount);
     const resetAt = new Date(user.lastResetDate);
     resetAt.setDate(resetAt.getDate() + 1);
     resetAt.setHours(0, 0, 0, 0);
-    
+
     res.json({
       success: true,
       user: {
@@ -74,11 +93,7 @@ app.get('/api/user-limit/:clerkId', async (req, res) => {
       resetAt: resetAt.toISOString()
     });
   } catch (error) {
-    console.error('Error getting user limit:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Internal server error'
-    });
+    handleError(res, error, 'Error getting user limit');
   }
 });
 
@@ -86,14 +101,28 @@ app.get('/api/user-limit/:clerkId', async (req, res) => {
 app.post('/api/user', async (req, res) => {
   try {
     const { clerkId, email } = req.body;
-    
+
     if (!clerkId || !email) {
       return res.status(400).json({
         success: false,
         error: 'clerkId and email are required'
       });
     }
-    
+
+    if (!isValidClerkId(clerkId)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid clerkId format'
+      });
+    }
+
+    if (!isValidEmail(email)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid email format'
+      });
+    }
+
     const user = await prisma.user.upsert({
       where: { clerkId },
       update: { email },
@@ -104,7 +133,7 @@ app.post('/api/user', async (req, res) => {
         lastResetDate: new Date()
       }
     });
-    
+
     res.json({
       success: true,
       user: {
@@ -114,11 +143,7 @@ app.post('/api/user', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error creating/updating user:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Internal server error'
-    });
+    handleError(res, error, 'Error creating/updating user');
   }
 });
 
@@ -127,23 +152,23 @@ app.post('/api/increment-count/:clerkId', async (req, res) => {
   try {
     const { clerkId } = req.params;
     const { count = 1 } = req.body;
-    
+
     console.log('🔍 API: Increment count request:', { clerkId, count });
-    
+
     let user = await prisma.user.findUnique({
       where: { clerkId }
     });
-    
+
     if (!user) {
       return res.status(404).json({
         success: false,
         error: 'User not found'
       });
     }
-    
+
     // Check if daily limit needs reset
     user = await checkAndResetDailyLimit(user);
-    
+
     // Check if user has reached daily limit
     if (user.dailyImageCount + count > 20) {
       return res.status(429).json({
@@ -154,7 +179,7 @@ app.post('/api/increment-count/:clerkId', async (req, res) => {
         remaining: Math.max(0, 20 - user.dailyImageCount)
       });
     }
-    
+
     // Increment count
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
@@ -162,15 +187,15 @@ app.post('/api/increment-count/:clerkId', async (req, res) => {
         dailyImageCount: user.dailyImageCount + count
       }
     });
-    
+
     const remaining = Math.max(0, 20 - updatedUser.dailyImageCount);
-    
-    console.log('🔍 API: Count incremented successfully:', { 
-      limit: 20, 
-      current: updatedUser.dailyImageCount, 
-      remaining 
+
+    console.log('🔍 API: Count incremented successfully:', {
+      limit: 20,
+      current: updatedUser.dailyImageCount,
+      remaining
     });
-    
+
     res.json({
       success: true,
       user: {
@@ -182,11 +207,7 @@ app.post('/api/increment-count/:clerkId', async (req, res) => {
       remaining
     });
   } catch (error) {
-    console.error('Error incrementing count:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Internal server error'
-    });
+    handleError(res, error, 'Error incrementing count');
   }
 });
 

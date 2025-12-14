@@ -5,10 +5,12 @@ import ResultsPanel from './components/ResultsPanel';
 import ImageModal from './components/ImageModal';
 import AuthWrapper from './components/AuthWrapper';
 import { generateImageFromPose, getApiStatus } from './services/geminiService';
-import type { GeneratedImage } from './types';
+import type { GeneratedImage, ApiStatus } from './types';
 import { Github, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
 import { useUser } from '@clerk/clerk-react';
 import { useUserLimit } from './hooks/useUserLimit';
+import { API_BASE_URL } from './constants';
+import { logger } from './utils/logger';
 
 const App: React.FC = () => {
   const { user } = useUser();
@@ -24,7 +26,7 @@ const App: React.FC = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUploading, setIsUploading] = useState<boolean>(false);
-  const [apiStatus, setApiStatus] = useState<any>(null);
+  const [apiStatus, setApiStatus] = useState<ApiStatus | null>(null);
 
   const handleImageUpload = (file: File) => {
     setIsUploading(true);
@@ -84,7 +86,7 @@ const App: React.FC = () => {
 
     if (user) {
       try {
-        const response = await fetch(`http://localhost:4999/api/user-limit/${user.id}`);
+        const response = await fetch(`${API_BASE_URL}/api/user-limit/${user.id}`);
         const data = await response.json();
 
         if (data.success && data.remaining < allPoses.length) {
@@ -92,7 +94,7 @@ const App: React.FC = () => {
           return;
         }
       } catch (error) {
-        console.error('Error checking user limit:', error);
+        logger.error('Error checking user limit:', error);
       }
     }
 
@@ -153,7 +155,7 @@ const App: React.FC = () => {
 
     if (user) {
       try {
-        await fetch(`http://localhost:4999/api/increment-count/${user.id}`, {
+        await fetch(`${API_BASE_URL}/api/increment-count/${user.id}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -162,7 +164,7 @@ const App: React.FC = () => {
         });
         refreshLimit();
       } catch (error) {
-        console.error('Error updating generation count:', error);
+        logger.error('Error updating generation count:', error);
       }
     }
 
@@ -190,7 +192,7 @@ const App: React.FC = () => {
 
     if (user) {
       try {
-        const response = await fetch(`http://localhost:4999/api/user-limit/${user.id}`);
+        const response = await fetch(`${API_BASE_URL}/api/user-limit/${user.id}`);
         const data = await response.json();
 
         if (data.success && data.remaining < 1) {
@@ -198,7 +200,7 @@ const App: React.FC = () => {
           return;
         }
       } catch (error) {
-        console.error('Error checking user limit:', error);
+        logger.error('Error checking user limit:', error);
       }
     }
 
@@ -232,7 +234,7 @@ const App: React.FC = () => {
 
       if (user) {
         try {
-          await fetch(`http://localhost:4999/api/increment-count/${user.id}`, {
+          await fetch(`${API_BASE_URL}/api/increment-count/${user.id}`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -241,7 +243,7 @@ const App: React.FC = () => {
           });
           refreshLimit();
         } catch (error) {
-          console.error('Error updating generation count:', error);
+          logger.error('Error updating generation count:', error);
         }
       }
     } catch (error) {

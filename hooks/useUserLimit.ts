@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
+import { API_BASE_URL } from '../constants';
+import { logger } from '../utils/logger';
 
 interface UserLimitData {
   limit: number;
@@ -18,23 +20,23 @@ export const useUserLimit = (): UserLimitData => {
     resetAt: null,
     isLoading: true,
     error: null,
-    refresh: () => {}
+    refresh: () => { }
   });
 
   const fetchUserLimit = useCallback(async () => {
     if (!user) {
-      console.log('🔍 useUserLimit: No user, setting default');
+      logger.debug('useUserLimit: No user, setting default');
       setLimitData(prev => ({ ...prev, isLoading: false }));
       return;
     }
 
     try {
-      console.log('🔍 useUserLimit: Fetching limit for user:', user.id);
+      logger.debug('useUserLimit: Fetching limit for user:', user.id);
       setLimitData(prev => ({ ...prev, isLoading: true, error: null }));
-      
+
       // First, ensure user exists in our database
-      console.log('🔍 useUserLimit: Creating/updating user in database');
-      await fetch('http://localhost:4999/api/user', {
+      logger.debug('useUserLimit: Creating/updating user in database');
+      await fetch(`${API_BASE_URL}/api/user`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -46,13 +48,13 @@ export const useUserLimit = (): UserLimitData => {
       });
 
       // Then get the limit data
-      console.log('🔍 useUserLimit: Getting limit data');
-      const response = await fetch(`http://localhost:4999/api/user-limit/${user.id}`);
+      logger.debug('useUserLimit: Getting limit data');
+      const response = await fetch(`${API_BASE_URL}/api/user-limit/${user.id}`);
       const data = await response.json();
-      console.log('🔍 useUserLimit: API response:', data);
+      logger.debug('useUserLimit: API response:', data);
 
       if (data.success) {
-        console.log('🔍 useUserLimit: Setting limit data:', { limit: data.limit, remaining: data.remaining });
+        logger.debug('useUserLimit: Setting limit data:', { limit: data.limit, remaining: data.remaining });
         setLimitData({
           limit: data.limit,
           remaining: data.remaining,
@@ -62,7 +64,7 @@ export const useUserLimit = (): UserLimitData => {
           refresh: fetchUserLimit
         });
       } else {
-        console.log('🔍 useUserLimit: API error:', data.error);
+        logger.error('useUserLimit: API error:', data.error);
         setLimitData(prev => ({
           ...prev,
           isLoading: false,
@@ -71,7 +73,7 @@ export const useUserLimit = (): UserLimitData => {
         }));
       }
     } catch (error) {
-      console.error('🔍 useUserLimit: Error fetching user limit:', error);
+      logger.error('useUserLimit: Error fetching user limit:', error);
       // If API is not available, show default limit
       setLimitData({
         limit: 20,

@@ -1,13 +1,14 @@
 import React from 'react';
 import type { Pose } from './types';
 
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4999';
+
 // Custom SVG Icons as React Components
 const RunningIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="6.5" cy="4.5" r="2.5"></circle>
     <path d="M14 11l-2.5 2.5-4-4-2.5 2.5"></path>
     <path d="M10 20l-1.5-4-4-1"></path>
-    <path d="M19 14l-4 4-3-2"></path>
   </svg>
 );
 
