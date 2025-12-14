@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   SignedIn,
   SignedOut,
@@ -7,7 +7,6 @@ import {
   UserButton,
 } from '@clerk/clerk-react';
 import { Loader2, Image, Zap } from 'lucide-react';
-import { useUserLimit } from '../hooks/useUserLimit';
 
 interface AuthWrapperProps {
   children: React.ReactNode;
@@ -59,17 +58,14 @@ const clerkAppearance = {
   }
 };
 
-const UserLimitDisplay: React.FC<{ refreshLimit?: () => void }> = ({ refreshLimit }) => {
-  const { remaining, limit, isLoading, error, refresh } = useUserLimit();
+interface UserLimitDisplayProps {
+  remaining: number;
+  limit: number;
+  isLoading: boolean;
+  error: string | null;
+}
 
-  const refreshFunction = refreshLimit || refresh;
-
-  useEffect(() => {
-    if (refreshLimit) {
-      refreshLimit();
-    }
-  }, [refreshLimit]);
-
+const UserLimitDisplay: React.FC<UserLimitDisplayProps> = ({ remaining, limit, isLoading, error }) => {
   if (isLoading) {
     return (
       <div className="flex items-center space-x-2 text-sm">
@@ -101,9 +97,8 @@ const UserLimitDisplay: React.FC<{ refreshLimit?: () => void }> = ({ refreshLimi
 
       <div className="w-12 sm:w-20 neu-progress h-1.5 sm:h-2">
         <div
-          className={`h-full rounded-full transition-all duration-300 ${
-            isLow ? 'bg-neu-danger' : 'bg-neu-success'
-          }`}
+          className={`h-full rounded-full transition-all duration-300 ${isLow ? 'bg-neu-danger' : 'bg-neu-success'
+            }`}
           style={{ width: `${percentage}%` }}
         />
       </div>
@@ -117,7 +112,7 @@ const UserLimitDisplay: React.FC<{ refreshLimit?: () => void }> = ({ refreshLimi
   );
 };
 
-const AuthWrapper: React.FC<AuthWrapperProps> = ({ children, refreshLimit }) => {
+const AuthWrapper: React.FC<AuthWrapperProps & { limitData?: any }> = ({ children, refreshLimit, limitData }) => {
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--neu-base)', color: 'var(--neu-text)' }}>
       {/* Header */}
@@ -137,7 +132,7 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children, refreshLimit }) => 
             {/* User controls */}
             <div className="flex items-center gap-2 sm:gap-4">
               <SignedIn>
-                <UserLimitDisplay refreshLimit={refreshLimit} />
+                {limitData && <UserLimitDisplay {...limitData} />}
                 <UserButton appearance={clerkAppearance} />
               </SignedIn>
             </div>

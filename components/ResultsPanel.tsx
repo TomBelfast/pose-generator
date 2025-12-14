@@ -39,7 +39,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
       <div className="neu-pressed relative aspect-square w-full flex items-center justify-center rounded-[var(--radius-lg)]">
         {isGenerating ? (
           <div className="text-center p-4 sm:p-6">
-            <Spinner className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-4 text-neu-accent" />
+            <Spinner className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-4 text-neu-success" />
             <p className="text-base sm:text-lg font-medium text-neu-text">
               Generowanie {generationProgress.current}/{generationProgress.total}...
             </p>
@@ -80,7 +80,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
           </>
         ) : selectedImage && selectedImage.status === 'loading' ? (
           <div className="text-center p-4 sm:p-6">
-            <Spinner className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-4 text-neu-accent" />
+            <Spinner className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-4 text-neu-success" />
             <p className="text-base font-medium text-neu-text">Generowanie...</p>
             <p className="text-sm text-neu-text-muted mt-2">{selectedImage.prompt}</p>
           </div>
@@ -147,7 +147,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
               >
                 {img.status === 'loading' && (
                   <div className="w-full h-full flex items-center justify-center animate-pulse">
-                    <Spinner className="w-5 h-5 sm:w-6 sm:h-6 text-neu-accent" />
+                    <Spinner className="w-5 h-5 sm:w-6 sm:h-6 text-neu-success" />
                   </div>
                 )}
                 {img.status === 'failed' && (
@@ -187,4 +187,4 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
   );
 };
 
-export default ResultsPanel;
+export default React.memo(ResultsPanel);

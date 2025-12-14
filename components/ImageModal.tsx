@@ -274,4 +274,4 @@ const ImageModal: React.FC<ImageModalProps> = ({
   );
 };
 
-export default ImageModal;
+export default React.memo(ImageModal);

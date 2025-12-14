@@ -1,16 +1,8 @@
 
-import { GoogleGenAI, Modality } from "@google/genai";
 import { logger } from "../utils/logger";
+import { API_BASE_URL } from "../constants";
 
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-
-if (!API_KEY || API_KEY === 'YOUR_API_KEY_HERE') {
-  throw new Error("VITE_GEMINI_API_KEY environment variable not set. Please create a .env file with your Gemini API key.");
-}
-
-const ai = new GoogleGenAI({ apiKey: API_KEY });
-
-// Rate limiting configuration for Gemini 2.5 Flash
+// Rate limiting configuration for Client-side queueing
 const RATE_LIMIT = {
   MAX_REQUESTS_PER_MINUTE: 8, // Leave some buffer below the 10 RPM limit
   MIN_DELAY_BETWEEN_REQUESTS: 8000, // 8 seconds between requests
@@ -102,103 +94,52 @@ const retryWithBackoff = async <T>(
   throw lastError!;
 };
 
-const fileToGenerativePart = (base64: string, mimeType: string) => {
-  return {
-    inlineData: {
-      data: base64,
-      mimeType,
-    },
-  };
-};
-
 export const generateImageFromPose = async (
   base64Image: string,
   mimeType: string,
   posePrompt: string,
   ratio: string = '1:1'
 ): Promise<string> => {
-  // Try different models for swimming prompts
-  const model = 'gemini-2.5-flash-image-preview';
-  logger.debug("Using model:", model);
-
-  logger.debug("Starting image generation");
-  logger.debug("API Key exists:", !!API_KEY);
-  logger.debug("API Key length:", API_KEY?.length || 0);
-  logger.debug("Model:", model);
-  logger.debug("Pose prompt:", posePrompt);
-  logger.debug("Image ratio:", ratio);
-  logger.debug("Image size:", base64Image.length, "characters");
-  logger.debug("MIME type:", mimeType);
-
-  // Wait for rate limit before making request
-  await waitForRateLimit();
-
   // Update API status
   apiStatus.totalRequests++;
   apiStatus.lastRequestTime = Date.now();
 
-  const imagePart = fileToGenerativePart(base64Image, mimeType);
-  // Try different prompt variations for swimming
-  let finalPrompt = posePrompt;
-  if (posePrompt.toLowerCase().includes('swimming')) {
-    logger.debug("Detected swimming prompt, trying alternative formulations");
-    // Try a more descriptive swimming prompt
-    finalPrompt = "a character in a swimming pose, arms extended forward, body horizontal, as if gliding through water";
-  }
-
-  const textPart = { text: `Recreate the character in this image in a new image, with the character in the following pose: ${finalPrompt}. Maintain the character's appearance and style. Generate the image with ${ratio} aspect ratio (${ratio === '9:16' ? 'portrait/vertical' : ratio === '16:9' ? 'landscape/horizontal' : 'square'} format).` };
-
-  logger.debug("Final prompt being sent:", finalPrompt);
-
   // Use retry mechanism with exponential backoff
   try {
     return await retryWithBackoff(async () => {
-      logger.debug("Sending request to Gemini API...");
+      logger.debug("Sending request to Backend API...");
       logger.debug("Aspect ratio:", ratio);
 
-      const response = await ai.models.generateContent({
-        model: model,
-        contents: {
-          parts: [imagePart, textPart],
+      const response = await fetch(`${API_BASE_URL}/api/generate-pose`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        config: {
-          responseModalities: [Modality.IMAGE, Modality.TEXT],
-          parameters: {
-            aspectRatio: ratio
-          }
-        },
+        body: JSON.stringify({
+          base64Image,
+          mimeType,
+          posePrompt,
+          ratio
+        })
       });
 
-      logger.debug("Received response from Gemini API");
-      logger.debug("Response structure:", {
-        hasCandidates: !!response.candidates,
-        candidatesLength: response.candidates?.length || 0,
-        firstCandidate: response.candidates?.[0] ? {
-          hasContent: !!response.candidates[0].content,
-          hasParts: !!response.candidates[0].content?.parts,
-          partsLength: response.candidates[0].content?.parts?.length || 0
-        } : null
-      });
-
-      for (const part of response.candidates?.[0]?.content?.parts || []) {
-        logger.debug("Processing part:", {
-          hasInlineData: !!part.inlineData,
-          hasText: !!part.text,
-          partType: part.inlineData ? 'image' : part.text ? 'text' : 'unknown'
-        });
-
-        if (part.inlineData) {
-          logger.debug("Found image data, size:", part.inlineData.data.length);
-          apiStatus.successfulRequests++;
-          return part.inlineData.data;
-        }
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
 
-      logger.error("No image data found in response parts");
-      throw new Error("No image was generated in the API response.");
+      const data = await response.json();
+
+      if (!data.success || !data.imageData) {
+        throw new Error("No image data received from backend");
+      }
+
+      logger.debug("Received image data from backend");
+      apiStatus.successfulRequests++;
+      return data.imageData;
     });
   } catch (error) {
-    logger.error("Error generating image with Gemini:", error);
+    logger.error("Error generating image:", error);
 
     // Update API status
     apiStatus.failedRequests++;
@@ -217,7 +158,7 @@ export const generateImageFromPose = async (
       if (error.message.includes('rate limit') || error.message.includes('quota') || error.message.includes('429')) {
         throw new Error("⚠️ Przekroczono limit zapytań API. Spróbuj ponownie za chwilę. (Rate limit exceeded)");
       } else if (error.message.includes('API key') || error.message.includes('authentication')) {
-        throw new Error("❌ Błąd autoryzacji API. Sprawdź klucz API. (Authentication error)");
+        throw new Error("❌ Błąd autoryzacji API. (Authentication error)");
       } else if (error.message.includes('No image was generated')) {
         throw new Error("🖼️ Nie udało się wygenerować obrazu. Spróbuj z inną pozycją. (Image generation failed)");
       } else {

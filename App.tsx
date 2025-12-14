@@ -2,10 +2,11 @@ import React, { useState, useMemo, useCallback } from 'react';
 import ImageUploader from './components/ImageUploader';
 import PoseSelector from './components/PoseSelector';
 import ResultsPanel from './components/ResultsPanel';
-import ImageModal from './components/ImageModal';
 import AuthWrapper from './components/AuthWrapper';
 import { generateImageFromPose, getApiStatus } from './services/geminiService';
 import type { GeneratedImage, ApiStatus } from './types';
+
+const ImageModal = React.lazy(() => import('./components/ImageModal'));
 import { Github, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
 import { useUser } from '@clerk/clerk-react';
 import { useUserLimit } from './hooks/useUserLimit';
@@ -14,7 +15,9 @@ import { logger } from './utils/logger';
 
 const App: React.FC = () => {
   const { user } = useUser();
-  const { refresh: refreshLimit } = useUserLimit();
+  const limitData = useUserLimit();
+  const { refresh: refreshLimit } = limitData;
+
   const [uploadedImage, setUploadedImage] = useState<{ file: File; base64: string; } | null>(null);
   const [uploadedImagePreview, setUploadedImagePreview] = useState<string | null>(null);
   const [selectedPoses, setSelectedPoses] = useState<Set<string>>(new Set());
@@ -247,7 +250,7 @@ const App: React.FC = () => {
         }
       }
     } catch (error) {
-      console.error('Failed to regenerate image:', error);
+      logger.error('Failed to regenerate image:', error);
       setGeneratedImages(prev => {
         const newImages = [...prev];
         newImages[selectedImageIndex] = {
@@ -282,7 +285,7 @@ const App: React.FC = () => {
   }, [generatedImages]);
 
   return (
-    <AuthWrapper refreshLimit={refreshLimit}>
+    <AuthWrapper refreshLimit={refreshLimit} limitData={limitData}>
       <div className="p-3 sm:p-6 lg:p-8 pb-24">
         <div className="max-w-7xl mx-auto">
           {/* Error alert */}
@@ -393,15 +396,17 @@ const App: React.FC = () => {
         </div>
 
         {/* Image Modal */}
-        <ImageModal
-          images={generatedImages}
-          currentIndex={selectedImageIndex || 0}
-          isOpen={isModalOpen}
-          onClose={handleModalClose}
-          onNavigate={handleModalNavigate}
-          onDownloadAll={handleDownloadAll}
-          onRegenerate={handleRegenerate}
-        />
+        <React.Suspense fallback={null}>
+          <ImageModal
+            images={generatedImages}
+            currentIndex={selectedImageIndex || 0}
+            isOpen={isModalOpen}
+            onClose={handleModalClose}
+            onNavigate={handleModalNavigate}
+            onDownloadAll={handleDownloadAll}
+            onRegenerate={handleRegenerate}
+          />
+        </React.Suspense>
       </div>
     </AuthWrapper>
   );

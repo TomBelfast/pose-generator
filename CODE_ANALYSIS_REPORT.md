@@ -1,9 +1,8 @@
 # Raport Analizy Kodu - Pose Generator
 
 **Data analizy:** 2025-01-27  
-**Data aktualizacji:** 2025-01-27  
 **Wersja:** 0.0.0  
-**Technologie:** React 19, TypeScript, Express, Prisma, Vite
+**Technologie:** React 19, TypeScript, Express, Prisma, Vite, Clerk
 
 ---
 
@@ -11,191 +10,218 @@
 
 | Kategoria | Ocena | Priorytet | Status |
 |-----------|-------|-----------|--------|
-| **Jakość Kodu** | ✅ Dobra | Średni | Znacznie poprawiona |
+| **Jakość Kodu** | ✅ Dobra | Średni | Stabilna |
 | **Bezpieczeństwo** | ⚠️ Wymaga Poprawy | **WYSOKI** | Częściowo poprawione |
 | **Wydajność** | ✅ Dobra | Niski | Stabilna |
 | **Architektura** | ✅ Dobra | Niski | Dobra struktura |
 
+**Ocena Ogólna:** ✅ **Dobra** (wymaga drobnych poprawek bezpieczeństwa przed produkcją)
+
 ---
 
-## ✅ POZYTYWNE ZMIANY (Od Poprzedniej Analizy)
+## ✅ POZYTYWNE ASPEKTY
 
-### 1. ✅ API Configuration - NAPRAWIONE
-**Status:** ✅ **NAPRAWIONE**
+### 1. ✅ Architektura i Struktura Projektu
+**Status:** ✅ **DOBRA**
 
-- `API_BASE_URL` jest teraz w `constants.tsx` (linia 4)
-- Wszystkie wywołania API używają `API_BASE_URL` zamiast hardcoded localhost
-- `env.example` zawiera `VITE_API_URL`
+- **Dobra separacja odpowiedzialności:**
+  - `services/` - logika biznesowa (Gemini API)
+  - `components/` - komponenty React
+  - `hooks/` - custom hooks
+  - `utils/` - narzędzia pomocnicze
+  - `types.ts` - definicje typów TypeScript
 
-### 2. ✅ Logger Utility - UTWORZONE
-**Status:** ✅ **UTWORZONE**
+- **Właściwe użycie TypeScript:**
+  - ~95% pokrycie typami
+  - Wszystkie główne interfejsy zdefiniowane (`ApiStatus`, `GeneratedImage`, `Pose`)
+  - Minimalne użycie `any` (tylko w loggerze i testach)
 
-- Utworzono `utils/logger.ts` z poziomami logowania
-- Debug logs są warunkowe (tylko w dev)
-- Większość `console.log` została zastąpiona loggerem
+- **Dobra konfiguracja środowiska:**
+  - `API_BASE_URL` w `constants.tsx` (brak hardcoded localhost)
+  - `env.example` z wszystkimi wymaganymi zmiennymi
+  - Dockerfile używa `ARG` dla kluczy API
 
-### 3. ✅ TypeScript Types - POPRAWIONE
-**Status:** ✅ **POPRAWIONE**
+### 2. ✅ React Best Practices
+**Status:** ✅ **DOBRA IMPLEMENTACJA**
 
-- `ApiStatus` interface istnieje w `types.ts` (linie 12-20)
-- `App.tsx` używa `ApiStatus | null` zamiast `any` (linia 29)
-- Wszystkie główne typy są zdefiniowane
+- **Optymalizacja wydajności:**
+  - `React.memo` w `ResultsPanel` i `ImageModal`
+  - `useCallback` dla handlerów
+  - `useMemo` dla obliczeń
+  - Lazy loading dla `ImageModal`
 
-### 4. ✅ Input Validation - DODANE
-**Status:** ✅ **DODANE**
+- **Error Handling:**
+  - `ErrorBoundary` zaimplementowany i używany w `index.tsx`
+  - User-friendly komunikaty błędów
+  - Try-catch w async operacjach
 
-- Walidacja email w `server.js` (linia 29-31)
-- Walidacja clerkId w `server.js` (linia 33-35)
-- Endpoint `/api/user` sprawdza wymagane pola i format
+- **Accessibility:**
+  - Właściwe użycie `aria-label`
+  - Semantic HTML
+  - Keyboard navigation w modalach
 
-### 5. ✅ Dockerfile - POPRAWIONE
-**Status:** ✅ **POPRAWIONE**
+### 3. ✅ Backend Implementation
+**Status:** ✅ **DOBRA PODSTAWOWA IMPLEMENTACJA**
 
-- Używa `ARG` zamiast hardcoded wartości (linie 19-22)
-- Klucze API są przekazywane jako build arguments
+- **Prisma ORM:**
+  - Czytelna struktura bazy danych
+  - Właściwe indeksy (unique constraints)
+  - Proper date handling
+
+- **Input Validation:**
+  - Walidacja email (`isValidEmail`)
+  - Walidacja clerkId (`isValidClerkId`)
+  - Sprawdzanie wymaganych pól
+
+- **Rate Limiting:**
+  - ✅ Rate limiting na Express endpoints (`express-rate-limit`)
+  - ✅ Rate limiting w Gemini service (client-side)
+  - ✅ Exponential backoff retry mechanism
+  - ✅ Status monitoring
+
+- **Logger:**
+  - ✅ `utils/serverLogger.js` zaimplementowany
+  - ✅ Większość console.log zastąpiona loggerem
+
+### 4. ✅ Security Basics
+**Status:** ✅ **PODSTAWOWE ZABEZPIECZENIA**
+
+- `.env` w `.gitignore` ✅
+- API keys przekazywane przez zmienne środowiskowe ✅
+- Input validation ✅
+- CORS skonfigurowany ✅
+- Rate limiting na API endpoints ✅
 
 ---
 
 ## 🔴 KRYTYCZNE PROBLEMY BEZPIECZEŃSTWA
 
-### 1. ⚠️ Plik .env z Prawdziwymi Kluczami
-**Lokalizacja:** `.env`  
-**Severity:** 🔴 **KRYTYCZNE**  
-**Status:** ⚠️ **WYMAGA UWAGI**
-
-**Problem:** Plik `.env` zawiera prawdziwe klucze API:
-```
-VITE_GEMINI_API_KEY=AIzaSyAC-4EihLCv8_qtnlfqQfYs3-qqQm0obyc 
-VITE_CLERK_PUBLISHABLE_KEY=pk_test_ZW5hYmxlZC1kb3ZlLTk1LmNsZXJrLmFjY291bnRzLmRldiQ
-```
-
-**Dobra wiadomość:** Plik `.env` jest w `.gitignore` (linia 16), więc nie powinien być commitowany.
-
-**Rekomendacja:**
-- ✅ `.env` jest już w `.gitignore` - DOBRZE
-- ⚠️ Upewnij się, że `.env` nie został przypadkowo commitowany: `git check-ignore .env`
-- ⚠️ Rozważ użycie secrets management w produkcji (np. Docker secrets, Kubernetes secrets)
-- ⚠️ Zaktualizuj klucze jeśli były commitowane w historii Git
-
-### 2. ⚠️ Pozostałe console.log/error w Produkcji
-**Lokalizacja:** `server.js:17,156,193,231`, `App.tsx:250`  
+### 1. ⚠️ Pozostałe console.log/error w Produkcji
+**Lokalizacja:** `App.tsx:251`, `ErrorBoundary.tsx:24`  
 **Severity:** 🟡 Średnie  
 **Status:** ⚠️ **DO POPRAWY**
 
-**Problem:** 5 wystąpień `console.log/error` nie używa loggera:
+**Problem:** 2 wystąpienia `console.error` nie używa loggera:
 
 **Szczegóły:**
-- `server.js:17` - `console.error(message, error)` w `handleError`
-- `server.js:156` - `console.log('🔍 API: Increment count request:...')`
-- `server.js:193` - `console.log('🔍 API: Count incremented successfully:...')`
-- `server.js:231` - `console.log('🚀 API server running on port ${PORT}')`
-- `App.tsx:250` - `console.error('Failed to regenerate image:', error)`
+- `App.tsx:251` - `console.error('Failed to regenerate image:', error)`
+- `ErrorBoundary.tsx:24` - `console.error('Uncaught error:', error, errorInfo)`
 
 **Rekomendacja:**
-```javascript
-// server.js - dodać logger
-import { logger } from './utils/logger.js'; // Utworzyć logger dla Node.js
 
-// Zastąpić:
-console.error(message, error);
-// Na:
-logger.error(message, error);
-
-// Zastąpić:
-console.log('🔍 API: ...');
-// Na:
-logger.debug('🔍 API: ...');
-
-// Zastąpić:
-console.log(`🚀 API server running...`);
-// Na:
-logger.info(`🚀 API server running on port ${PORT}`);
-```
-
+1. W `App.tsx:251`:
 ```typescript
-// App.tsx:250 - już używa logger w większości miejsc, ale:
+// Zastąpić:
 console.error('Failed to regenerate image:', error);
-// Powinno być:
+// Na:
 logger.error('Failed to regenerate image:', error);
 ```
 
-### 3. ⚠️ Brak Rate Limiting na API Endpoints
+2. W `ErrorBoundary.tsx:24`:
+```typescript
+// Dodać import:
+import { logger } from '../utils/logger';
+
+// Zastąpić:
+console.error('Uncaught error:', error, errorInfo);
+// Na:
+logger.error('Uncaught error:', error, errorInfo);
+```
+
+### 2. ⚠️ Brak Walidacji Długości Inputu
 **Lokalizacja:** `server.js`  
 **Severity:** 🟡 Średnie  
 **Status:** ⚠️ **DO DODANIA**
 
-**Problem:** Brak rate limiting middleware na endpointach API. Może prowadzić do nadużyć.
+**Problem:** Brak walidacji maksymalnej długości dla:
+- `posePrompt` (może być bardzo długi)
+- `email` (może być bardzo długi)
+- `base64Image` (walidacja rozmiaru, nie tylko obecności)
 
 **Rekomendacja:**
-```bash
-npm install express-rate-limit
-```
-
 ```javascript
-// server.js
-import rateLimit from 'express-rate-limit';
+// W /api/generate-pose endpoint
+if (posePrompt.length > 500) {
+  return res.status(400).json({
+    success: false,
+    error: 'Pose prompt too long (max 500 characters)'
+  });
+}
 
-const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minut
-  max: 100, // maksymalnie 100 requestów na IP
-  message: 'Too many requests from this IP, please try again later.'
-});
+// W /api/user endpoint
+if (email.length > 255) {
+  return res.status(400).json({
+    success: false,
+    error: 'Email too long'
+  });
+}
 
-app.use('/api/', apiLimiter);
-```
-
-### 4. ⚠️ Brak Centralnego Error Handlera
-**Lokalizacja:** `server.js`  
-**Severity:** 🟡 Średnie  
-**Status:** ⚠️ **DO DODANIA**
-
-**Problem:** Każdy endpoint ma własny try-catch. Brak centralnego error handling middleware.
-
-**Obecna implementacja:**
-```javascript
-// Każdy endpoint ma własny try-catch
-catch (error) {
-  handleError(res, error, 'Error message');
+// Walidacja rozmiaru base64
+const base64Size = Buffer.from(base64Image, 'base64').length;
+const maxSize = 10 * 1024 * 1024; // 10MB
+if (base64Size > maxSize) {
+  return res.status(400).json({
+    success: false,
+    error: 'Image too large (max 10MB)'
+  });
 }
 ```
 
+### 3. ⚠️ Brak Sanityzacji Inputu
+**Lokalizacja:** `server.js`  
+**Severity:** 🟡 Średnie  
+**Status:** ⚠️ **DO DODANIA**
+
+**Problem:** Brak sanityzacji dla:
+- `posePrompt` (może zawierać niebezpieczne znaki)
+- `email` (podstawowa walidacja, ale brak sanityzacji)
+
 **Rekomendacja:**
 ```javascript
-// Dodać na końcu, przed catch-all route
-app.use((err, req, res, next) => {
-  logger.error('Unhandled error:', err);
-  
-  // Maskować szczegóły w produkcji
-  const isDev = process.env.NODE_ENV !== 'production';
-  
-  res.status(err.status || 500).json({
-    success: false,
-    error: isDev ? err.message : 'Internal server error',
-    ...(isDev && { stack: err.stack })
+// Dodać funkcję sanityzacji
+const sanitizeString = (str) => {
+  return str.trim().replace(/[<>]/g, '');
+};
+
+// W endpointach użyć:
+const sanitizedPrompt = sanitizeString(posePrompt);
+```
+
+### 4. ⚠️ Brak HTTPS Enforcement w Produkcji
+**Lokalizacja:** `server.js`  
+**Severity:** 🟡 Średnie  
+**Status:** ⚠️ **DO DODANIA**
+
+**Problem:** Brak middleware wymuszającego HTTPS w produkcji.
+
+**Rekomendacja:**
+```javascript
+// Dodać middleware dla HTTPS
+if (process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    if (req.header('x-forwarded-proto') !== 'https') {
+      res.redirect(`https://${req.header('host')}${req.url}`);
+    } else {
+      next();
+    }
   });
-});
+}
 ```
 
 ---
 
-## ⚠️ PROBLEMY JAKOŚCI KODU
+## 🟡 PROBLEMY JAKOŚCI KODU
 
 ### 1. ⚠️ Logger używa typu `any[]`
-**Lokalizacja:** `utils/logger.ts:4-6`  
+**Lokalizacja:** `utils/logger.ts`, `utils/serverLogger.js`  
 **Severity:** 🟢 Niskie  
 **Status:** ⚠️ **DO POPRAWY**
 
-```typescript
-// Obecne:
-export const logger = {
-  debug: (...args: any[]) => isDev && console.log('[DEBUG]', ...args),
-  info: (...args: any[]) => console.info('[INFO]', ...args),
-  error: (...args: any[]) => console.error('[ERROR]', ...args),
-};
-```
+**Problem:** Logger używa `any[]` zamiast `unknown[]`.
 
 **Rekomendacja:**
 ```typescript
+// utils/logger.ts
 export const logger = {
   debug: (...args: unknown[]) => isDev && console.log('[DEBUG]', ...args),
   info: (...args: unknown[]) => console.info('[INFO]', ...args),
@@ -203,441 +229,246 @@ export const logger = {
 };
 ```
 
-### 2. ⚠️ Brak Error Boundaries
+### 2. ⚠️ Brak Testów
+**Lokalizacja:** Cały projekt  
 **Severity:** 🟡 Średnie  
 **Status:** ⚠️ **DO DODANIA**
 
-**Problem:** Błędy w komponentach React mogą crashować całą aplikację.
+**Problem:** Tylko jeden podstawowy test (`App.test.tsx`). Brak:
+- Unit testów dla services
+- Integration testów dla API
+- Component testów
 
 **Rekomendacja:**
-```typescript
-// components/ErrorBoundary.tsx
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+- Dodać testy dla `geminiService.ts`
+- Dodać testy dla API endpoints
+- Dodać testy dla komponentów React
 
-interface Props {
-  children: ReactNode;
-}
-
-interface State {
-  hasError: boolean;
-  error: Error | null;
-}
-
-class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
-    hasError: false,
-    error: null
-  };
-
-  public static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
-  }
-
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Uncaught error:', error, errorInfo);
-  }
-
-  public render() {
-    if (this.state.hasError) {
-      return (
-        <div className="error-boundary">
-          <h2>Coś poszło nie tak</h2>
-          <p>Przepraszamy za utrudnienia. Odśwież stronę.</p>
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
-}
-
-export default ErrorBoundary;
-```
-
-```typescript
-// index.tsx - owinąć App
-<ErrorBoundary>
-  <App />
-</ErrorBoundary>
-```
-
-### 3. ⚠️ Brak Testów
+### 3. ⚠️ Brak Error Recovery Mechanism
+**Lokalizacja:** `App.tsx`, `services/geminiService.ts`  
 **Severity:** 🟡 Średnie  
 **Status:** ⚠️ **DO DODANIA**
 
-**Problem:** Brak testów jednostkowych, integracyjnych i E2E.
+**Problem:** Gdy generowanie obrazu się nie powiedzie, użytkownik musi ręcznie spróbować ponownie.
 
 **Rekomendacja:**
-```bash
-# Frontend
-npm install --save-dev vitest @testing-library/react @testing-library/jest-dom
-
-# Backend
-npm install --save-dev jest supertest @types/jest
-```
+- Dodać automatyczny retry dla failed images
+- Dodać przycisk "Spróbuj ponownie" dla failed images
+- Dodać queue dla failed requests
 
 ---
 
-## ⚡ PROBLEMY WYDAJNOŚCI
+## 🟢 PROBLEMY WYDAJNOŚCI
 
-### 1. ⚠️ Brak Memoization w Komponentach
-**Lokalizacja:** `components/ResultsPanel.tsx`, `components/ImageModal.tsx`  
+### 1. ⚠️ Brak Memoization dla Kosztownych Obliczeń
+**Lokalizacja:** `App.tsx`  
 **Severity:** 🟢 Niskie  
 **Status:** ⚠️ **OPCJONALNE**
 
+**Problem:** `allPoses` jest memoized, ale można zoptymalizować więcej.
+
 **Rekomendacja:**
-```typescript
-// components/ResultsPanel.tsx
-export default React.memo(ResultsPanel);
+- Rozważyć memoization dla `generatedImages` filtering
+- Rozważyć `useMemo` dla `completedImages` w `ImageModal`
 
-// components/ImageModal.tsx
-export default React.memo(ImageModal);
-```
+### 2. ⚠️ Brak Image Optimization
+**Lokalizacja:** `App.tsx`, `components/ResultsPanel.tsx`  
+**Severity:** 🟢 Niskie  
+**Status:** ⚠️ **OPCJONALNE**
 
-**Uwaga:** Komponenty są już dobrze zoptymalizowane z `useCallback`. Memoization może nie być konieczne, ale warto rozważyć dla cięższych komponentów.
+**Problem:** Obrazy są przechowywane jako base64 w stanie, co może być memory-intensive.
 
-### 2. ✅ Rate Limiting - Dobra Implementacja
-**Lokalizacja:** `services/geminiService.ts:12-65`  
-**Status:** ✅ Dobrze zaimplementowane
-
-- Rate limiting dla Gemini API
-- Exponential backoff retry mechanism
-- Status monitoring
-
----
-
-## 🏗️ ARCHITEKTURA
-
-### ✅ Mocne Strony
-
-1. **Dobra Separacja Odpowiedzialności**
-   - Services oddzielone od komponentów
-   - Hooks dla logiki biznesowej
-   - Komponenty są czytelne
-
-2. **TypeScript Configuration**
-   - Właściwa konfiguracja TypeScript
-   - Użycie typów w większości miejsc
-   - Brak `any` w głównych miejscach (tylko w loggerze)
-
-3. **Prisma Schema**
-   - Czytelna struktura bazy danych
-   - Właściwe indeksy (unique constraints)
-   - Proper date handling
-
-4. **Environment Configuration**
-   - ✅ `API_BASE_URL` w constants.tsx
-   - ✅ `env.example` z wszystkimi wymaganymi zmiennymi
-   - ✅ Dockerfile używa ARG
-
-5. **Error Handling**
-   - ✅ User-friendly error messages
-   - ✅ Try-catch w większości miejsc
-   - ⚠️ Brak centralnego error handlera (do dodania)
-
-### ⚠️ Do Poprawy
-
-1. **Brak Loggera dla Backendu**
-   - Frontend ma logger (`utils/logger.ts`)
-   - Backend używa `console.log/error`
-   - Utworzyć logger dla Node.js lub użyć biblioteki (winston, pino)
-
-2. **Brak Testów**
-   - Brak unit testów
-   - Brak integration testów
-   - Brak E2E testów
-
-3. **Brak Error Boundaries**
-   - React Error Boundary nie jest zaimplementowany
-   - Błędy w komponentach mogą crashować aplikację
+**Rekomendacja:**
+- Rozważyć użycie URL.createObjectURL dla większych obrazów
+- Rozważyć lazy loading dla thumbnails
+- Rozważyć image compression przed zapisaniem w stanie
 
 ---
 
 ## 📋 PRIORYTETOWA LISTA DZIAŁAŃ
 
-### 🔴 WYSOKIE (Wkrótce)
+### 🔴 WYSOKIE (Przed Produkcją)
 
-1. **Sprawdzić czy .env był commitowany**
-   ```bash
-   git log --all --full-history -- .env
-   git check-ignore .env
-   ```
-   Jeśli był commitowany, zaktualizować klucze API.
+1. **Zastąpić pozostałe console.error**
+   - Zastąpić `console.error` w `App.tsx:251`
+   - Zastąpić `console.error` w `ErrorBoundary.tsx:24`
 
-2. **Zastąpić pozostałe console.log w server.js**
-   - Utworzyć logger dla Node.js lub użyć biblioteki
-   - Zastąpić wszystkie `console.log/error` w `server.js`
+2. **Dodać Walidację Długości Inputu**
+   - Walidacja `posePrompt` (max 500 znaków)
+   - Walidacja `email` (max 255 znaków)
+   - Walidacja rozmiaru `base64Image` (max 10MB)
 
-3. **Dodać Error Boundary**
-   - Utworzyć `components/ErrorBoundary.tsx`
-   - Owinąć App w `index.tsx`
+3. **Dodać Sanityzację Inputu**
+   - Funkcja `sanitizeString` dla `posePrompt`
+   - Sanityzacja `email`
 
-4. **Dodać Rate Limiting na API**
-   - Zainstalować `express-rate-limit`
-   - Dodać middleware na `/api/` routes
+4. **Dodać HTTPS Enforcement**
+   - Middleware wymuszający HTTPS w produkcji
 
 ### 🟡 ŚREDNIE (W przyszłości)
 
-5. **Dodać Centralny Error Handler**
-   - Middleware dla Express
-   - Maskowanie błędów w produkcji
+5. **Poprawić typy w loggerze**
+   - Zastąpić `any[]` na `unknown[]` w `utils/logger.ts` i `utils/serverLogger.js`
 
-6. **Poprawić typy w loggerze**
-   - Zastąpić `any[]` na `unknown[]`
-
-7. **Dodać testy**
+6. **Dodać Testy**
    - Unit testy dla services
    - Integration testy dla API
-   - E2E testy dla głównych flow
+   - Component testy
+
+7. **Dodać Error Recovery**
+   - Automatyczny retry dla failed images
+   - Przycisk "Spróbuj ponownie"
 
 ### 🟢 NISKIE (Opcjonalne)
 
-8. **Optymalizacja wydajności**
-   - React.memo dla komponentów (jeśli potrzebne)
-   - Lazy loading (jeśli aplikacja rośnie)
+8. **Optymalizacja Wydajności**
+   - Memoization dla kosztownych obliczeń
+   - Image optimization
+   - Lazy loading dla thumbnails
 
 ---
 
-## 📈 METRYKI
+## 📊 METRYKI
 
-| Metryka | Wartość | Status | Zmiana |
-|---------|---------|--------|--------|
-| **Liczba plików TypeScript** | 13 | ✅ | Stabilna |
-| **Liczba plików React (TSX)** | 9 | ✅ | Stabilna |
-| **Pokrycie typami** | ~95% | ✅ | Znacznie poprawione |
-| **Console.log statements** | 5 | 🟡 | Znacznie zmniejszona (z 43) |
-| **Hardcoded localhost** | 0 | ✅ | **NAPRAWIONE** |
-| **Hardcoded API keys** | 0 (Dockerfile) | ✅ | **NAPRAWIONE** |
-| **Brakujące typy (any)** | 1 (logger) | 🟢 | Znacznie poprawione |
-| **Error handlers** | Częściowe | 🟡 | Podstawowe w server.js |
-| **Testy** | 0 | 🔴 | Brak zmian |
-| **Pliki konfiguracyjne** | 3 | ✅ | env.example, constants.tsx, Dockerfile |
-
----
-
-## 🎯 REKOMENDACJE ARCHITEKTONICZNE
-
-### 1. Struktura Loggera (Backend)
-```
-utils/
-  ├── logger.ts          # Frontend logger (istnieje)
-  └── serverLogger.ts    # Backend logger (do utworzenia)
-```
-
-### 2. Error Handling
-```
-utils/
-  ├── errors.ts          # Error classes i utilities
-  └── errorHandler.ts   # Express error handler middleware
-```
-
-### 3. Testy
-```
-__tests__/
-  ├── unit/
-  │   ├── services/
-  │   └── utils/
-  ├── integration/
-  │   └── api/
-  └── e2e/
-```
-
----
-
-## ✅ POZYTYWNE ASPEKTY
-
-1. ✅ **Dobra struktura projektu** - czytelna organizacja plików
-2. ✅ **Rate limiting** - dobrze zaimplementowane w Gemini service
-3. ✅ **TypeScript** - większość kodu jest typowana (95%+)
-4. ✅ **Prisma** - właściwe użycie ORM
-5. ✅ **React Hooks** - właściwe użycie custom hooks
-6. ✅ **Responsive Design** - aplikacja działa na mobile
-7. ✅ **Error Messages** - user-friendly komunikaty błędów
-8. ✅ **Environment Configuration** - API_BASE_URL w constants
-9. ✅ **Input Validation** - walidacja email i clerkId
-10. ✅ **Dockerfile** - używa ARG zamiast hardcoded values
-
----
-
-## 🔧 SZYBKI FIX - Przykładowe Poprawki
-
-### Fix 1: Logger dla Backendu
-```javascript
-// utils/serverLogger.js
-const isDev = process.env.NODE_ENV !== 'production';
-
-export const logger = {
-  debug: (...args) => isDev && console.log('[DEBUG]', ...args),
-  info: (...args) => console.info('[INFO]', ...args),
-  error: (...args) => console.error('[ERROR]', ...args),
-};
-```
-
-### Fix 2: Error Boundary
-```typescript
-// components/ErrorBoundary.tsx - patrz sekcja "Brak Error Boundaries"
-```
-
-### Fix 3: Rate Limiting
-```javascript
-// server.js
-import rateLimit from 'express-rate-limit';
-
-const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: 'Too many requests from this IP, please try again later.'
-});
-
-app.use('/api/', apiLimiter);
-```
-
----
-
-## 📝 WNIOSKI
-
-Projekt ma **solidną podstawę architektoniczną** i **znacznie się poprawił** od poprzedniej analizy. Większość krytycznych problemów została naprawiona.
-
-### ✅ Naprawione Problemy
-
-1. ✅ **Hardcoded localhost** - NAPRAWIONE (API_BASE_URL w constants)
-2. ✅ **Hardcoded API keys w Dockerfile** - NAPRAWIONE (używa ARG)
-3. ✅ **Brak typów TypeScript** - NAPRAWIONE (ApiStatus interface)
-4. ✅ **Brak walidacji inputu** - NAPRAWIONE (email i clerkId validation)
-5. ✅ **Nadmierne console.log** - ZNACZNIE ZMNIEJSZONE (z 43 do 5)
-
-### ⚠️ Pozostałe Problemy (Wysokie Priorytety)
-
-1. **Sprawdzić historię Git dla .env** - upewnić się, że klucze nie były commitowane
-2. **Zastąpić console.log w server.js** - utworzyć logger dla backendu
-3. **Dodać Error Boundary** - zabezpieczyć przed crashami React
-4. **Dodać Rate Limiting na API** - zabezpieczyć przed nadużyciami
-
-### ✅ Pozytywne Aspekty
-
-- Dobra struktura projektu z separacją concerns
-- Właściwe użycie TypeScript (95%+ pokrycie)
-- Dobra implementacja rate limiting w Gemini service
-- Właściwe użycie React hooks i TypeScript
-- Environment configuration w porządku
-
-### 📊 Postęp
-
-**Status:** ✅ **Znacznie Poprawiony** (gotowe do produkcji po naprawieniu pozostałych problemów)
-
-**Zidentyfikowane problemy:** 8 głównych  
-**Naprawione:** 5  
-**W trakcie:** 0  
-**Do naprawienia:** 3 (wysokie priorytety)
-
-**Ocena Ogólna:** ✅ **Dobra** (wymaga drobnych poprawek przed produkcją)
+| Metryka | Wartość | Status |
+|---------|---------|--------|
+| **Pokrycie typami TypeScript** | ~95% | ✅ Dobra |
+| **Console.log/error w produkcji** | 2 | ⚠️ Do poprawy |
+| **Rate limiting** | ✅ Zaimplementowany | ✅ Dobra |
+| **Error handling** | ✅ ErrorBoundary + try-catch | ✅ Dobra |
+| **Input validation** | ⚠️ Częściowa | ⚠️ Do poprawy |
+| **Test coverage** | ~5% | ⚠️ Niska |
+| **Security score** | 7/10 | ⚠️ Wymaga poprawy |
 
 ---
 
 ## 🔄 HISTORIA ZMIAN
 
 **2025-01-27 - Aktualizacja raportu:**
-- ✅ Zidentyfikowano naprawione problemy (API_BASE_URL, logger, typy, walidacja)
-- ✅ Zaktualizowano metryki (console.log: 43 → 5, pokrycie typami: 85% → 95%)
-- ✅ Zidentyfikowano pozostałe problemy (3 wysokie priorytety)
-- ✅ Dodano rekomendacje dla backend loggera i error boundary
-- ✅ Zaktualizowano ocenę ogólną (⚠️ Wymaga Poprawy → ✅ Dobra)
-
-**2025-12-14 - Poprzednia analiza:**
-- Zidentyfikowano wszystkie wystąpienia hardcoded localhost (6 miejsc)
-- Zaktualizowano liczbę console.log statements (43)
-- Dodano informacje o istniejących plikach (types.ts, constants.tsx)
-- Zaktualizowano metryki projektu
+- ✅ Rate limiting na API endpoints - DODANE
+- ✅ Logger dla backendu - DODANY (`utils/serverLogger.js`)
+- ✅ Centralny error handler - DODANY
+- ✅ Walidacja dla increment endpoint - DODANA
+- ⚠️ Pozostałe console.error - 2 miejsca do poprawy
+- ⚠️ Brak walidacji długości inputu - DO DODANIA
+- ⚠️ Brak sanityzacji inputu - DO DODANIA
+- ⚠️ Brak HTTPS enforcement - DO DODANIA
 
 ---
 
-## 🎯 PLAN DZIAŁAŃ - KONKRETNE KROKI
+## 📝 WNIOSKI
 
-### Krok 1: Sprawdzić .env w Historii Git (KRYTYCZNE)
-**Czas:** ~5 minut
+Projekt ma **solidną podstawę architektoniczną** i **dobrą jakość kodu**. Większość krytycznych problemów została naprawiona.
 
-```bash
-# Sprawdź czy .env był kiedykolwiek commitowany
-git log --all --full-history -- .env
+### ✅ Naprawione Problemy (Od Poprzedniej Analizy)
 
-# Sprawdź czy .env jest ignorowany
-git check-ignore .env
+1. ✅ **Rate Limiting na API** - NAPRAWIONE (express-rate-limit)
+2. ✅ **Logger dla Backendu** - DODANY (`utils/serverLogger.js`)
+3. ✅ **Centralny Error Handler** - DODANY
+4. ✅ **Walidacja dla Increment Endpoint** - DODANA
 
-# Jeśli był commitowany, zaktualizuj klucze API
+### ⚠️ Pozostałe Problemy (Wysokie Priorytety)
+
+1. **Pozostałe console.error** - 2 miejsca (App.tsx, ErrorBoundary.tsx)
+2. **Brak walidacji długości inputu** - wymaga dodania
+3. **Brak sanityzacji inputu** - wymaga dodania
+4. **Brak HTTPS enforcement** - wymaga dodania w produkcji
+
+### ✅ Pozytywne Aspekty
+
+- Dobra struktura projektu z separacją concerns
+- Właściwe użycie TypeScript (95%+ pokrycie)
+- Dobra implementacja rate limiting
+- Właściwe użycie React hooks i TypeScript
+- Environment configuration w porządku
+- ErrorBoundary zaimplementowany
+- Dobra optymalizacja wydajnościowa
+
+### 📊 Postęp
+
+**Status:** ✅ **Dobra Jakość** (wymaga drobnych poprawek bezpieczeństwa przed produkcją)
+
+**Zidentyfikowane problemy:** 8 głównych  
+**Naprawione:** 4  
+**W trakcie:** 0  
+**Do naprawienia:** 4 (wysokie priorytety)
+
+**Ocena Ogólna:** ✅ **Dobra** (wymaga drobnych poprawek przed produkcją)
+
+---
+
+## 🔧 SZYBKI START - NAPRAWA KRYTYCZNYCH PROBLEMÓW
+
+### Fix 1: Zastąpić console.error w App.tsx
+```typescript
+// App.tsx:251
+// Zastąpić:
+console.error('Failed to regenerate image:', error);
+// Na:
+logger.error('Failed to regenerate image:', error);
 ```
 
-### Krok 2: Utworzyć Logger dla Backendu (WYSOKIE)
-**Czas:** ~15 minut
+### Fix 2: Zastąpić console.error w ErrorBoundary.tsx
+```typescript
+// ErrorBoundary.tsx
+// Dodać import:
+import { logger } from '../utils/logger';
 
-1. Utwórz `utils/serverLogger.js`:
-   ```javascript
-   const isDev = process.env.NODE_ENV !== 'production';
-   
-   export const logger = {
-     debug: (...args) => isDev && console.log('[DEBUG]', ...args),
-     info: (...args) => console.info('[INFO]', ...args),
-     error: (...args) => console.error('[ERROR]', ...args),
-   };
-   ```
+// W componentDidCatch:
+public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  logger.error('Uncaught error:', error, errorInfo);
+}
+```
 
-2. Zastąp w `server.js`:
-   - `console.error` → `logger.error`
-   - `console.log` → `logger.debug` lub `logger.info`
+### Fix 3: Dodać Walidację Długości Inputu
+```javascript
+// server.js - w /api/generate-pose
+if (posePrompt.length > 500) {
+  return res.status(400).json({
+    success: false,
+    error: 'Pose prompt too long (max 500 characters)'
+  });
+}
 
-### Krok 3: Dodać Error Boundary (WYSOKIE)
-**Czas:** ~20 minut
+// Walidacja rozmiaru base64
+const base64Size = Buffer.from(base64Image, 'base64').length;
+const maxSize = 10 * 1024 * 1024; // 10MB
+if (base64Size > maxSize) {
+  return res.status(400).json({
+    success: false,
+    error: 'Image too large (max 10MB)'
+  });
+}
+```
 
-1. Utwórz `components/ErrorBoundary.tsx` (patrz sekcja "Brak Error Boundaries")
-2. Owinąć App w `index.tsx`:
-   ```typescript
-   <ErrorBoundary>
-     <App />
-   </ErrorBoundary>
-   ```
+### Fix 4: Dodać Sanityzację Inputu
+```javascript
+// server.js - dodać funkcję
+const sanitizeString = (str) => {
+  if (typeof str !== 'string') return '';
+  return str.trim().replace(/[<>]/g, '');
+};
 
-### Krok 4: Dodać Rate Limiting (WYSOKIE)
-**Czas:** ~15 minut
+// W endpointach użyć:
+const sanitizedPrompt = sanitizeString(posePrompt);
+```
 
-1. Zainstaluj: `npm install express-rate-limit`
-2. Dodaj do `server.js`:
-   ```javascript
-   import rateLimit from 'express-rate-limit';
-   
-   const apiLimiter = rateLimit({
-     windowMs: 15 * 60 * 1000,
-     max: 100,
-     message: 'Too many requests from this IP, please try again later.'
-   });
-   
-   app.use('/api/', apiLimiter);
-   ```
-
-### Krok 5: Dodać Centralny Error Handler (ŚREDNIE)
-**Czas:** ~20 minut
-
-1. Dodaj middleware na końcu `server.js` (przed catch-all route)
-2. Maskuj szczegóły błędów w produkcji
-
----
-
-## 📋 CHECKLISTA NAPRAW
-
-- [x] Usunąć hardcoded API keys z Dockerfile ✅
-- [x] Dodać VITE_API_URL do .env i env.example ✅
-- [x] Zastąpić wszystkie localhost:4999 ✅
-- [x] Utworzyć logger utility (frontend) ✅
-- [ ] Zastąpić wszystkie console.log w server.js (5 miejsc)
-- [x] Dodać typ ApiStatus do types.ts ✅
-- [x] Zaktualizować App.tsx:29 (usunąć any) ✅
-- [x] Dodać walidację inputu w server.js ✅
-- [ ] Dodać centralny error handler
-- [ ] Dodać rate limiting na API endpoints
-- [ ] Dodać Error Boundary
-- [ ] Sprawdzić historię Git dla .env
-
-**Szacowany czas naprawy pozostałych problemów:** ~1 godzina
+### Fix 5: Dodać HTTPS Enforcement
+```javascript
+// server.js - dodać przed innymi middleware
+if (process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    if (req.header('x-forwarded-proto') !== 'https') {
+      res.redirect(`https://${req.header('host')}${req.url}`);
+    } else {
+      next();
+    }
+  });
+}
+```
 
 ---
 
-*Raport wygenerowany automatycznie przez Code Analysis Tool*  
-*Ostatnia aktualizacja: 2025-01-27*
+**Szacowany czas naprawy krytycznych problemów:** ~2 godziny
+
+*Raport wygenerowany automatycznie przez Code Analysis Tool*

@@ -34,23 +34,29 @@ export const useUserLimit = (): UserLimitData => {
       logger.debug('useUserLimit: Fetching limit for user:', user.id);
       setLimitData(prev => ({ ...prev, isLoading: true, error: null }));
 
-      // First, ensure user exists in our database
-      logger.debug('useUserLimit: Creating/updating user in database');
-      await fetch(`${API_BASE_URL}/api/user`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          clerkId: user.id,
-          email: user.primaryEmailAddress?.emailAddress || ''
-        })
-      });
-
-      // Then get the limit data
+      // First, try to get the limit data directly
       logger.debug('useUserLimit: Getting limit data');
-      const response = await fetch(`${API_BASE_URL}/api/user-limit/${user.id}`);
-      const data = await response.json();
+      let response = await fetch(`${API_BASE_URL}/api/user-limit/${user.id}`);
+      let data = await response.json();
+
+      // If user not found (or limit data indicates null user), create the user
+      if (data.success && data.user === null) {
+        logger.debug('useUserLimit: User not found, creating/updating user in database');
+        await fetch(`${API_BASE_URL}/api/user`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            clerkId: user.id,
+            email: user.primaryEmailAddress?.emailAddress || ''
+          })
+        });
+
+        // Fetch again after creation
+        response = await fetch(`${API_BASE_URL}/api/user-limit/${user.id}`);
+        data = await response.json();
+      }
       logger.debug('useUserLimit: API response:', data);
 
       if (data.success) {
